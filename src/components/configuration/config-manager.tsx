@@ -60,10 +60,8 @@ export interface FieldDef {
 
 export interface ConfigManagerProps {
   model: ConfigModel;
-  // The records to display. Each is a generic key/value record.
   rows: Record<string, unknown>[];
   fields: FieldDef[];
-  // How to render extra display columns referencing related names.
   relatedLabels?: Record<string, Record<string, string>>;
 }
 

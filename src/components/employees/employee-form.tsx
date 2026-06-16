@@ -139,7 +139,6 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
 
   return (
     <div className="flex flex-col">
-      {/* Action / save bar */}
       <div className="flex flex-wrap items-center gap-3 bg-control-bar px-4 py-2.5">
         <div className="flex items-center gap-2">
           <button
@@ -169,7 +168,6 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
           </span>
         </div>
 
-        {/* Smart buttons */}
         <div className="ml-auto flex flex-wrap gap-2">
           {smartButtons.map((btn) => {
             const Icon = btn.icon;
@@ -208,7 +206,6 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
           Create User
         </button>
 
-        {/* Header */}
         <div className="flex flex-col gap-6 md:flex-row">
           <div className="shrink-0">
             <input
@@ -378,7 +375,6 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
             </div>
           </TabsContent>
 
-          {/* RESUME */}
           <TabsContent value="resume" className="pt-6">
             <SectionTitle>Resume</SectionTitle>
             <p className="mt-2 text-sm text-muted-foreground">
@@ -387,7 +383,6 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
             </p>
           </TabsContent>
 
-          {/* PERSONAL */}
           <TabsContent value="personal" className="pt-6">
             <div className="grid gap-10 md:grid-cols-2">
               <div className="flex flex-col gap-4">
@@ -455,7 +450,6 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
             </div>
           </TabsContent>
 
-          {/* PAYROLL */}
           <TabsContent value="payroll" className="pt-6">
             <div className="grid max-w-md gap-4">
               <SectionTitle>Contract</SectionTitle>
@@ -477,7 +471,6 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
             </div>
           </TabsContent>
 
-          {/* SETTINGS */}
           <TabsContent value="settings" className="pt-6">
             <div className="grid max-w-md gap-4">
               <SectionTitle>Status</SectionTitle>
