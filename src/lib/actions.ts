@@ -1,14 +1,8 @@
 "use server";
 
-// Write-side data access (mutations) exposed as Server Actions.
-// On migration to PostgreSQL, replace the store operations with parameterized
-// INSERT/UPDATE/DELETE statements; the action signatures remain the same.
-
 import { revalidatePath } from "next/cache";
-import { genId, store, timestamps, touch } from "@/lib/db/store";
+import { prisma } from "@/lib/db/prisma";
 import type { ConfigModel, Employee } from "@/lib/types";
-
-// --- Employees ------------------------------------------------------------
 
 export interface EmployeeInput {
   name: string;
@@ -35,73 +29,99 @@ export interface EmployeeInput {
   kanbanState?: Employee["kanbanState"];
 }
 
-function normalize(
-  input: EmployeeInput
-): Omit<Employee, "id" | "createdAt" | "updatedAt" | "active"> {
+function emptyToNull(value?: string | null) {
+  return value && value.trim() ? value : null;
+}
+
+function parseDate(value?: string) {
+  return value ? new Date(`${value}T00:00:00.000Z`) : null;
+}
+
+function normalize(input: EmployeeInput) {
   return {
     name: input.name.trim(),
     workEmail: input.workEmail?.trim() ?? "",
     workPhone: input.workPhone?.trim() ?? "",
     workMobile: input.workMobile?.trim() ?? "",
     avatarUrl: input.avatarUrl ?? null,
-    tagIds: input.tagIds ?? [],
-    jobPositionId: input.jobPositionId || null,
+    jobPositionId: emptyToNull(input.jobPositionId),
     jobTitle: input.jobTitle?.trim() ?? "",
-    departmentId: input.departmentId || null,
-    managerId: input.managerId || null,
-    employeeTypeId: input.employeeTypeId || null,
-    workLocationId: input.workLocationId || null,
+    departmentId: emptyToNull(input.departmentId),
+    managerId: emptyToNull(input.managerId),
+    employeeTypeId: emptyToNull(input.employeeTypeId),
+    workLocationId: emptyToNull(input.workLocationId),
     company: input.company?.trim() ?? "",
     privateEmail: input.privateEmail?.trim() ?? "",
     privatePhone: input.privatePhone?.trim() ?? "",
     privateAddress: input.privateAddress?.trim() ?? "",
-    gender: input.gender ?? "",
-    dateOfBirth: input.dateOfBirth ?? "",
+    gender: input.gender || null,
+    dateOfBirth: parseDate(input.dateOfBirth),
     nationality: input.nationality?.trim() ?? "",
-    maritalStatus: input.maritalStatus ?? "",
+    maritalStatus: input.maritalStatus || null,
     monthlyHours: input.monthlyHours ?? 0,
     kanbanState: input.kanbanState ?? "normal",
   };
 }
 
-export async function createEmployee(input: EmployeeInput): Promise<string> {
-  if (!input.name?.trim()) throw new Error("Employee name is required");
-  const id = genId("emp");
-  store.employees.push({
-    id,
-    active: true,
-    ...normalize(input),
-    ...timestamps(),
-  });
+function revalidateEmployeeViews(id?: string) {
   revalidatePath("/employees");
   revalidatePath("/departments");
-  return id;
+  if (id) revalidatePath(`/employees/${id}`);
+}
+
+export async function createEmployee(input: EmployeeInput): Promise<string> {
+  if (!input.name?.trim()) throw new Error("Employee name is required");
+
+  const employee = await prisma.employee.create({
+    data: {
+      ...normalize(input),
+      active: true,
+      tags: {
+        create: (input.tagIds ?? []).map((tagId) => ({
+          tag: { connect: { id: tagId } },
+        })),
+      },
+    },
+    select: { id: true },
+  });
+
+  revalidateEmployeeViews(employee.id);
+  return employee.id;
 }
 
 export async function updateEmployee(
   id: string,
   input: EmployeeInput
 ): Promise<void> {
-  const idx = store.employees.findIndex((e) => e.id === id);
-  if (idx === -1) throw new Error("Employee not found");
-  store.employees[idx] = {
-    ...store.employees[idx],
-    ...normalize(input),
-    ...touch(),
-  };
-  revalidatePath("/employees");
-  revalidatePath(`/employees/${id}`);
-  revalidatePath("/departments");
+  if (!input.name?.trim()) throw new Error("Employee name is required");
+
+  await prisma.$transaction([
+    prisma.employeeTag.deleteMany({ where: { employeeId: id } }),
+    prisma.employee.update({
+      where: { id },
+      data: {
+        ...normalize(input),
+        tags: {
+          create: (input.tagIds ?? []).map((tagId) => ({
+            tag: { connect: { id: tagId } },
+          })),
+        },
+      },
+    }),
+  ]);
+
+  revalidateEmployeeViews(id);
 }
 
 export async function deleteEmployee(id: string): Promise<void> {
-  const idx = store.employees.findIndex((e) => e.id === id);
-  if (idx !== -1) store.employees.splice(idx, 1);
-  revalidatePath("/employees");
-  revalidatePath("/departments");
+  await prisma.employee.delete({ where: { id } });
+  revalidateEmployeeViews(id);
 }
 
-// --- Departments ----------------------------------------------------------
+export async function archiveEmployee(id: string): Promise<void> {
+  await prisma.employee.update({ where: { id }, data: { active: false } });
+  revalidateEmployeeViews(id);
+}
 
 export async function createDepartment(input: {
   name: string;
@@ -111,65 +131,52 @@ export async function createDepartment(input: {
 }): Promise<string> {
   if (!input.name?.trim()) throw new Error("Department name is required");
   const colors = ["#22d3ee", "#d946a6", "#34d399", "#f59e0b", "#60a5fa"];
-  const id = genId("dep");
-  store.departments.push({
-    id,
-    name: input.name.trim(),
-    managerId: input.managerId || null,
-    parentId: input.parentId || null,
-    color: input.color || colors[store.departments.length % colors.length],
-    ...timestamps(),
+  const count = await prisma.department.count();
+  const department = await prisma.department.create({
+    data: {
+      name: input.name.trim(),
+      managerId: emptyToNull(input.managerId),
+      parentId: emptyToNull(input.parentId),
+      color: input.color || colors[count % colors.length],
+    },
+    select: { id: true },
   });
   revalidatePath("/departments");
   revalidatePath("/employees");
-  return id;
+  return department.id;
 }
 
 export async function updateDepartment(
   id: string,
-  input: { name?: string; managerId?: string | null; color?: string }
+  input: {
+    name?: string;
+    managerId?: string | null;
+    parentId?: string | null;
+    color?: string;
+  }
 ): Promise<void> {
-  const idx = store.departments.findIndex((d) => d.id === id);
-  if (idx === -1) throw new Error("Department not found");
-  const dep = store.departments[idx];
-  store.departments[idx] = {
-    ...dep,
-    name: input.name?.trim() ?? dep.name,
-    managerId:
-      input.managerId === undefined ? dep.managerId : input.managerId || null,
-    color: input.color ?? dep.color,
-    ...touch(),
-  };
-  revalidatePath("/departments");
-}
-
-export async function deleteDepartment(id: string): Promise<void> {
-  const idx = store.departments.findIndex((d) => d.id === id);
-  if (idx !== -1) store.departments.splice(idx, 1);
-  store.employees.forEach((e) => {
-    if (e.departmentId === id) e.departmentId = null;
+  await prisma.department.update({
+    where: { id },
+    data: {
+      ...(input.name !== undefined ? { name: input.name.trim() } : {}),
+      ...(input.managerId !== undefined
+        ? { managerId: emptyToNull(input.managerId) }
+        : {}),
+      ...(input.parentId !== undefined
+        ? { parentId: emptyToNull(input.parentId) }
+        : {}),
+      ...(input.color !== undefined ? { color: input.color } : {}),
+    },
   });
   revalidatePath("/departments");
   revalidatePath("/employees");
 }
 
-// --- Generic configuration models ----------------------------------------
-
-const configCollections = {
-  "job-positions": () => store.jobPositions,
-  "employee-types": () => store.employeeTypes,
-  "work-locations": () => store.workLocations,
-  tags: () => store.tags,
-  "departure-reasons": () => store.departureReasons,
-} as const;
-
-const idPrefix: Record<ConfigModel, string> = {
-  "job-positions": "job",
-  "employee-types": "et",
-  "work-locations": "wl",
-  tags: "tag",
-  "departure-reasons": "dr",
-};
+export async function deleteDepartment(id: string): Promise<void> {
+  await prisma.department.delete({ where: { id } });
+  revalidatePath("/departments");
+  revalidatePath("/employees");
+}
 
 export async function createConfigItem(
   model: ConfigModel,
@@ -177,26 +184,51 @@ export async function createConfigItem(
 ): Promise<string> {
   const name = String(data.name ?? "").trim();
   if (!name) throw new Error("Name is required");
-  const id = genId(idPrefix[model]);
-  const base: Record<string, unknown> = { id, name, ...timestamps() };
 
+  let created: { id: string };
   switch (model) {
     case "job-positions":
-      base.departmentId = (data.departmentId as string) || null;
+      created = await prisma.jobPosition.create({
+        data: {
+          name,
+          departmentId: emptyToNull(data.departmentId as string | undefined),
+        },
+        select: { id: true },
+      });
+      break;
+    case "employee-types":
+      created = await prisma.employeeType.create({
+        data: { name },
+        select: { id: true },
+      });
       break;
     case "work-locations":
-      base.address = String(data.address ?? "");
-      base.locationType = (data.locationType as string) || "office";
+      created = await prisma.workLocation.create({
+        data: {
+          name,
+          address: String(data.address ?? ""),
+          locationType: (data.locationType as any) || "office",
+        },
+        select: { id: true },
+      });
       break;
     case "tags":
-      base.color = String(data.color ?? "#b45309");
+      created = await prisma.tag.create({
+        data: { name, color: String(data.color ?? "#b45309") },
+        select: { id: true },
+      });
+      break;
+    case "departure-reasons":
+      created = await prisma.departureReason.create({
+        data: { name },
+        select: { id: true },
+      });
       break;
   }
 
-  // @ts-expect-error generic push into the matching collection
-  configCollections[model]().push(base);
   revalidatePath(`/configuration/${model}`);
-  return id;
+  revalidatePath("/employees");
+  return created.id;
 }
 
 export async function updateConfigItem(
@@ -204,23 +236,84 @@ export async function updateConfigItem(
   id: string,
   data: Record<string, unknown>
 ): Promise<void> {
-  const collection = configCollections[model]() as unknown as Array<
-    Record<string, unknown>
-  >;
-  const idx = collection.findIndex((item) => item.id === id);
-  if (idx === -1) throw new Error("Item not found");
-  collection[idx] = { ...collection[idx], ...data, ...touch() };
+  const name = data.name === undefined ? undefined : String(data.name).trim();
+  switch (model) {
+    case "job-positions":
+      await prisma.jobPosition.update({
+        where: { id },
+        data: {
+          ...(name !== undefined ? { name } : {}),
+          ...(data.departmentId !== undefined
+            ? {
+                departmentId: emptyToNull(
+                  data.departmentId as string | undefined
+                ),
+              }
+            : {}),
+        },
+      });
+      break;
+    case "employee-types":
+      await prisma.employeeType.update({
+        where: { id },
+        data: { ...(name !== undefined ? { name } : {}) },
+      });
+      break;
+    case "work-locations":
+      await prisma.workLocation.update({
+        where: { id },
+        data: {
+          ...(name !== undefined ? { name } : {}),
+          ...(data.address !== undefined
+            ? { address: String(data.address ?? "") }
+            : {}),
+          ...(data.locationType !== undefined
+            ? { locationType: data.locationType as any }
+            : {}),
+        },
+      });
+      break;
+    case "tags":
+      await prisma.tag.update({
+        where: { id },
+        data: {
+          ...(name !== undefined ? { name } : {}),
+          ...(data.color !== undefined ? { color: String(data.color) } : {}),
+        },
+      });
+      break;
+    case "departure-reasons":
+      await prisma.departureReason.update({
+        where: { id },
+        data: { ...(name !== undefined ? { name } : {}) },
+      });
+      break;
+  }
   revalidatePath(`/configuration/${model}`);
+  revalidatePath("/employees");
 }
 
 export async function deleteConfigItem(
   model: ConfigModel,
   id: string
 ): Promise<void> {
-  const collection = configCollections[model]() as unknown as Array<
-    Record<string, unknown>
-  >;
-  const idx = collection.findIndex((item) => item.id === id);
-  if (idx !== -1) collection.splice(idx, 1);
+  switch (model) {
+    case "job-positions":
+      await prisma.jobPosition.delete({ where: { id } });
+      break;
+    case "employee-types":
+      await prisma.employeeType.delete({ where: { id } });
+      break;
+    case "work-locations":
+      await prisma.workLocation.delete({ where: { id } });
+      break;
+    case "tags":
+      await prisma.tag.delete({ where: { id } });
+      break;
+    case "departure-reasons":
+      await prisma.departureReason.delete({ where: { id } });
+      break;
+  }
   revalidatePath(`/configuration/${model}`);
+  revalidatePath("/employees");
 }

@@ -1,4 +1,4 @@
-import { store } from "@/lib/db/store";
+import { prisma } from "@/lib/db/prisma";
 import type {
   ConfigModel,
   Department,
@@ -11,23 +11,141 @@ import type {
   WorkLocation,
 } from "@/lib/types";
 
-function clone<T>(value: T): T {
-  return JSON.parse(JSON.stringify(value));
+function iso(value: Date | string): string {
+  return value instanceof Date ? value.toISOString() : value;
 }
 
-export function getDepartments(): Department[] {
-  return clone(store.departments);
+function dateOnly(value: Date | null | undefined): string {
+  return value ? value.toISOString().slice(0, 10) : "";
 }
 
-export function getDepartment(id: string): Department | null {
-  const dep = store.departments.find((d) => d.id === id);
-  return dep ? clone(dep) : null;
+function mapDepartment(d: any): Department {
+  return {
+    id: d.id,
+    name: d.name,
+    parentId: d.parentId,
+    managerId: d.managerId,
+    color: d.color,
+    createdAt: iso(d.createdAt),
+    updatedAt: iso(d.updatedAt),
+  };
 }
 
-export function countEmployeesByDepartment(departmentId: string): number {
-  return store.employees.filter(
-    (e) => e.active && e.departmentId === departmentId
-  ).length;
+function mapJobPosition(j: any): JobPosition {
+  return {
+    id: j.id,
+    name: j.name,
+    departmentId: j.departmentId,
+    createdAt: iso(j.createdAt),
+    updatedAt: iso(j.updatedAt),
+  };
+}
+
+function mapEmployeeType(t: any): EmployeeType {
+  return {
+    id: t.id,
+    name: t.name,
+    createdAt: iso(t.createdAt),
+    updatedAt: iso(t.updatedAt),
+  };
+}
+
+function mapWorkLocation(w: any): WorkLocation {
+  return {
+    id: w.id,
+    name: w.name,
+    address: w.address,
+    locationType: w.locationType,
+    createdAt: iso(w.createdAt),
+    updatedAt: iso(w.updatedAt),
+  };
+}
+
+function mapTag(t: any): Tag {
+  return {
+    id: t.id,
+    name: t.name,
+    color: t.color,
+    createdAt: iso(t.createdAt),
+    updatedAt: iso(t.updatedAt),
+  };
+}
+
+function mapDepartureReason(d: any): DepartureReason {
+  return {
+    id: d.id,
+    name: d.name,
+    createdAt: iso(d.createdAt),
+    updatedAt: iso(d.updatedAt),
+  };
+}
+
+function mapEmployee(e: any): Employee {
+  return {
+    id: e.id,
+    name: e.name,
+    active: e.active,
+    workEmail: e.workEmail,
+    workPhone: e.workPhone,
+    workMobile: e.workMobile,
+    avatarUrl: e.avatarUrl,
+    tagIds: e.tags?.map((item: any) => item.tagId) ?? [],
+    jobPositionId: e.jobPositionId,
+    jobTitle: e.jobTitle,
+    departmentId: e.departmentId,
+    managerId: e.managerId,
+    employeeTypeId: e.employeeTypeId,
+    workLocationId: e.workLocationId,
+    company: e.company,
+    privateEmail: e.privateEmail,
+    privatePhone: e.privatePhone,
+    privateAddress: e.privateAddress,
+    gender: e.gender ?? "",
+    dateOfBirth: dateOnly(e.dateOfBirth),
+    nationality: e.nationality,
+    maritalStatus: e.maritalStatus ?? "",
+    monthlyHours: e.monthlyHours,
+    kanbanState: e.kanbanState,
+    createdAt: iso(e.createdAt),
+    updatedAt: iso(e.updatedAt),
+  };
+}
+
+function mapEmployeeWithRelations(e: any): EmployeeWithRelations {
+  return {
+    ...mapEmployee(e),
+    department: e.department ? mapDepartment(e.department) : null,
+    jobPosition: e.jobPosition ? mapJobPosition(e.jobPosition) : null,
+    employeeType: e.employeeType ? mapEmployeeType(e.employeeType) : null,
+    workLocation: e.workLocation ? mapWorkLocation(e.workLocation) : null,
+    manager: e.manager ? mapEmployee(e.manager) : null,
+    tags: e.tags?.map((item: any) => mapTag(item.tag)) ?? [],
+  };
+}
+
+const employeeInclude = {
+  department: true,
+  jobPosition: true,
+  employeeType: true,
+  workLocation: true,
+  manager: { include: { tags: true } },
+  tags: { include: { tag: true } },
+};
+
+export async function getDepartments(): Promise<Department[]> {
+  const rows = await prisma.department.findMany({ orderBy: { name: "asc" } });
+  return rows.map(mapDepartment);
+}
+
+export async function getDepartment(id: string): Promise<Department | null> {
+  const row = await prisma.department.findUnique({ where: { id } });
+  return row ? mapDepartment(row) : null;
+}
+
+export async function countEmployeesByDepartment(
+  departmentId: string
+): Promise<number> {
+  return prisma.employee.count({ where: { active: true, departmentId } });
 }
 
 export interface DepartmentWithCount extends Department {
@@ -35,43 +153,22 @@ export interface DepartmentWithCount extends Department {
   managerName: string | null;
 }
 
-export function getDepartmentsWithCounts(): DepartmentWithCount[] {
-  return store.departments.map((d) => ({
-    ...clone(d),
-    employeeCount: countEmployeesByDepartment(d.id),
-    managerName: d.managerId
-      ? store.employees.find((e) => e.id === d.managerId)?.name ?? null
-      : null,
-  }));
-}
+export async function getDepartmentsWithCounts(): Promise<
+  DepartmentWithCount[]
+> {
+  const rows = await prisma.department.findMany({
+    orderBy: { name: "asc" },
+    include: {
+      manager: { select: { name: true } },
+      _count: { select: { employees: { where: { active: true } } } },
+    },
+  });
 
-function resolveEmployee(e: Employee): EmployeeWithRelations {
-  return {
-    ...clone(e),
-    department: e.departmentId
-      ? clone(store.departments.find((d) => d.id === e.departmentId) ?? null)
-      : null,
-    jobPosition: e.jobPositionId
-      ? clone(store.jobPositions.find((j) => j.id === e.jobPositionId) ?? null)
-      : null,
-    employeeType: e.employeeTypeId
-      ? clone(
-          store.employeeTypes.find((t) => t.id === e.employeeTypeId) ?? null
-        )
-      : null,
-    workLocation: e.workLocationId
-      ? clone(
-          store.workLocations.find((w) => w.id === e.workLocationId) ?? null
-        )
-      : null,
-    manager: e.managerId
-      ? clone(store.employees.find((m) => m.id === e.managerId) ?? null)
-      : null,
-    tags: e.tagIds
-      .map((id) => store.tags.find((t) => t.id === id))
-      .filter(Boolean)
-      .map((t) => clone(t!)),
-  };
+  return rows.map((d: any) => ({
+    ...mapDepartment(d),
+    employeeCount: d._count.employees,
+    managerName: d.manager?.name ?? null,
+  }));
 }
 
 export interface EmployeeQuery {
@@ -79,79 +176,129 @@ export interface EmployeeQuery {
   departmentId?: string;
 }
 
-export function getEmployees(
+export async function getEmployees(
   query: EmployeeQuery = {}
-): EmployeeWithRelations[] {
-  let list = store.employees.filter((e) => e.active);
+): Promise<EmployeeWithRelations[]> {
+  const rows = await prisma.employee.findMany({
+    where: {
+      active: true,
+      ...(query.departmentId ? { departmentId: query.departmentId } : {}),
+      ...(query.search
+        ? {
+            OR: [
+              { name: { contains: query.search, mode: "insensitive" } },
+              { workEmail: { contains: query.search, mode: "insensitive" } },
+              { jobTitle: { contains: query.search, mode: "insensitive" } },
+            ],
+          }
+        : {}),
+    },
+    orderBy: { name: "asc" },
+    include: employeeInclude,
+  });
+  return rows.map(mapEmployeeWithRelations);
+}
 
-  if (query.departmentId) {
-    list = list.filter((e) => e.departmentId === query.departmentId);
+export async function getEmployee(
+  id: string
+): Promise<EmployeeWithRelations | null> {
+  const row = await prisma.employee.findUnique({
+    where: { id },
+    include: employeeInclude,
+  });
+  return row ? mapEmployeeWithRelations(row) : null;
+}
+
+export async function getJobPositions(): Promise<JobPosition[]> {
+  return (await prisma.jobPosition.findMany({ orderBy: { name: "asc" } })).map(
+    mapJobPosition
+  );
+}
+
+export async function getEmployeeTypes(): Promise<EmployeeType[]> {
+  return (await prisma.employeeType.findMany({ orderBy: { name: "asc" } })).map(
+    mapEmployeeType
+  );
+}
+
+export async function getWorkLocations(): Promise<WorkLocation[]> {
+  return (await prisma.workLocation.findMany({ orderBy: { name: "asc" } })).map(
+    mapWorkLocation
+  );
+}
+
+export async function getTags(): Promise<Tag[]> {
+  return (await prisma.tag.findMany({ orderBy: { name: "asc" } })).map(mapTag);
+}
+
+export async function getDepartureReasons(): Promise<DepartureReason[]> {
+  return (
+    await prisma.departureReason.findMany({ orderBy: { name: "asc" } })
+  ).map(mapDepartureReason);
+}
+
+export async function getConfigRows(
+  model: ConfigModel
+): Promise<Record<string, unknown>[]> {
+  switch (model) {
+    case "job-positions":
+      return (await getJobPositions()) as unknown as Record<string, unknown>[];
+    case "employee-types":
+      return (await getEmployeeTypes()) as unknown as Record<string, unknown>[];
+    case "work-locations":
+      return (await getWorkLocations()) as unknown as Record<string, unknown>[];
+    case "tags":
+      return (await getTags()) as unknown as Record<string, unknown>[];
+    case "departure-reasons":
+      return (await getDepartureReasons()) as unknown as Record<
+        string,
+        unknown
+      >[];
   }
-
-  if (query.search) {
-    const q = query.search.toLowerCase();
-    list = list.filter(
-      (e) =>
-        e.name.toLowerCase().includes(q) ||
-        e.workEmail.toLowerCase().includes(q) ||
-        e.jobTitle.toLowerCase().includes(q)
-    );
-  }
-
-  return list.sort((a, b) => a.name.localeCompare(b.name)).map(resolveEmployee);
 }
 
-export function getEmployee(id: string): EmployeeWithRelations | null {
-  const emp = store.employees.find((e) => e.id === id);
-  return emp ? resolveEmployee(emp) : null;
-}
+export async function getFormOptions() {
+  const [
+    departments,
+    jobPositions,
+    employeeTypes,
+    workLocations,
+    tags,
+    managers,
+  ] = await Promise.all([
+    prisma.department.findMany({
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
+    prisma.jobPosition.findMany({
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
+    prisma.employeeType.findMany({
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
+    prisma.workLocation.findMany({
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
+    prisma.tag.findMany({
+      orderBy: { name: "asc" },
+      select: { id: true, name: true, color: true },
+    }),
+    prisma.employee.findMany({
+      where: { active: true },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
+  ]);
 
-export function getJobPositions(): JobPosition[] {
-  return clone(store.jobPositions);
-}
-
-export function getEmployeeTypes(): EmployeeType[] {
-  return clone(store.employeeTypes);
-}
-
-export function getWorkLocations(): WorkLocation[] {
-  return clone(store.workLocations);
-}
-
-export function getTags(): Tag[] {
-  return clone(store.tags);
-}
-
-export function getDepartureReasons(): DepartureReason[] {
-  return clone(store.departureReasons);
-}
-
-const configCollections: Record<ConfigModel, () => unknown[]> = {
-  "job-positions": () => store.jobPositions,
-  "employee-types": () => store.employeeTypes,
-  "work-locations": () => store.workLocations,
-  tags: () => store.tags,
-  "departure-reasons": () => store.departureReasons,
-};
-
-export function getConfigRows(model: ConfigModel): Record<string, unknown>[] {
-  return clone(configCollections[model]()) as Record<string, unknown>[];
-}
-
-export interface Option {
-  id: string;
-  name: string;
-}
-
-export function getFormOptions() {
   return {
-    departments: store.departments.map((d) => ({ id: d.id, name: d.name })),
-    jobPositions: store.jobPositions.map((j) => ({ id: j.id, name: j.name })),
-    employeeTypes: store.employeeTypes.map((t) => ({ id: t.id, name: t.name })),
-    workLocations: store.workLocations.map((w) => ({ id: w.id, name: w.name })),
-    tags: store.tags.map((t) => ({ id: t.id, name: t.name, color: t.color })),
-    managers: store.employees
-      .filter((e) => e.active)
-      .map((e) => ({ id: e.id, name: e.name })),
+    departments,
+    jobPositions,
+    employeeTypes,
+    workLocations,
+    tags,
+    managers,
   };
 }

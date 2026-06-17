@@ -8,9 +8,12 @@ export default async function EmployeeDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const employee = getEmployee(id);
+  const [employee, options] = await Promise.all([
+    getEmployee(id),
+    getFormOptions(),
+  ]);
+
   if (!employee) notFound();
 
-  const options = getFormOptions();
   return <EmployeeForm options={options} employee={employee} />;
 }

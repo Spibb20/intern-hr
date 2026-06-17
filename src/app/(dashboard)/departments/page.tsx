@@ -11,7 +11,7 @@ export default async function DepartmentsPage({
   const params = await searchParams;
   const view: ViewType = params.view === "list" ? "list" : "kanban";
 
-  let departments = getDepartmentsWithCounts();
+  let departments = await getDepartmentsWithCounts();
   if (params.q) {
     const q = params.q.toLowerCase();
     departments = departments.filter((d) => d.name.toLowerCase().includes(q));

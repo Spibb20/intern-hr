@@ -20,11 +20,13 @@ export default async function EmployeesPage({
   const view: ViewType = params.view === "list" ? "list" : "kanban";
   const page = Math.max(1, Number(params.page) || 1);
 
-  const departments = getDepartmentsWithCounts();
-  const allEmployees = getEmployees({
-    search: params.q,
-    departmentId: params.department,
-  });
+  const [departments, allEmployees] = await Promise.all([
+    getDepartmentsWithCounts(),
+    getEmployees({
+      search: params.q,
+      departmentId: params.department,
+    }),
+  ]);
 
   const total = allEmployees.length;
   const employees = allEmployees.slice(

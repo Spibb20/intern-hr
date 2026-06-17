@@ -50,7 +50,7 @@ interface FormOptions {
 }
 
 interface EmployeeFormProps {
-  options: FormOptions;
+  options?: Partial<FormOptions>;
   employee?: EmployeeWithRelations;
 }
 
@@ -62,6 +62,14 @@ const smartButtons = [
 ];
 
 export function EmployeeForm({ options, employee }: EmployeeFormProps) {
+  const formOptions: FormOptions = {
+    departments: options?.departments ?? [],
+    jobPositions: options?.jobPositions ?? [],
+    employeeTypes: options?.employeeTypes ?? [],
+    workLocations: options?.workLocations ?? [],
+    tags: options?.tags ?? [],
+    managers: options?.managers ?? [],
+  };
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -268,7 +276,7 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
               </HeaderField>
               <HeaderField icon={TagIcon}>
                 <div className="flex flex-wrap gap-1.5">
-                  {options.tags.map((tag) => {
+                  {formOptions.tags.map((tag) => {
                     const active = form.tagIds?.includes(tag.id);
                     return (
                       <button
@@ -294,7 +302,7 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
                       </button>
                     );
                   })}
-                  {options.tags.length === 0 && (
+                  {formOptions.tags.length === 0 && (
                     <span className="text-sm text-muted-foreground">
                       e.g. Founder, Motorized, ...
                     </span>
@@ -329,7 +337,7 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
                 <FieldSelect
                   label="Department"
                   value={form.departmentId}
-                  options={options.departments}
+                  options={formOptions.departments}
                   onChange={(v) => set("departmentId", v)}
                 />
                 <FieldText
@@ -341,7 +349,7 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
                 <FieldSelect
                   label="Manager"
                   value={form.managerId}
-                  options={options.managers.filter(
+                  options={formOptions.managers.filter(
                     (m) => m.id !== employee?.id
                   )}
                   onChange={(v) => set("managerId", v)}
@@ -349,7 +357,7 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
                 <FieldSelect
                   label="Work Location"
                   value={form.workLocationId}
-                  options={options.workLocations}
+                  options={formOptions.workLocations}
                   onChange={(v) => set("workLocationId", v)}
                 />
                 <FieldText
@@ -366,8 +374,9 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
                 <div className="rounded-md border border-dashed border-border p-4 text-sm text-muted-foreground">
                   {form.managerId
                     ? `Reports to ${
-                        options.managers.find((m) => m.id === form.managerId)
-                          ?.name
+                        formOptions.managers.find(
+                          (m) => m.id === form.managerId
+                        )?.name
                       }`
                     : "No manager set."}
                 </div>
@@ -456,7 +465,7 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
               <FieldSelect
                 label="Employee Type"
                 value={form.employeeTypeId}
-                options={options.employeeTypes}
+                options={formOptions.employeeTypes}
                 onChange={(v) => set("employeeTypeId", v)}
               />
               <div className="grid grid-cols-[140px_1fr] items-center gap-3">

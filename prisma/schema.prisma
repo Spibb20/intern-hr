@@ -1,0 +1,170 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Gender {
+  male
+  female
+  other
+}
+
+enum MaritalStatus {
+  single
+  married
+  cohabitant
+  widower
+  divorced
+}
+
+enum LocationType {
+  office
+  home
+  other
+}
+
+enum KanbanState {
+  normal
+  done
+  blocked
+}
+
+model Department {
+  id        String   @id @default(cuid())
+  name      String
+  parentId  String?  @map("parent_id")
+  managerId String?  @map("manager_id")
+  color     String   @default("#22d3ee")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  parent       Department?  @relation("DepartmentTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children     Department[] @relation("DepartmentTree")
+  manager      Employee?    @relation("DepartmentManager", fields: [managerId], references: [id], onDelete: SetNull)
+  employees    Employee[]   @relation("EmployeeDepartment")
+  jobPositions JobPosition[]
+
+  @@index([parentId])
+  @@index([managerId])
+  @@map("departments")
+}
+
+model JobPosition {
+  id           String   @id @default(cuid())
+  name         String
+  departmentId String?  @map("department_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  department Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  employees  Employee[]
+
+  @@index([departmentId])
+  @@map("job_positions")
+}
+
+model EmployeeType {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  employees Employee[]
+
+  @@map("employee_types")
+}
+
+model WorkLocation {
+  id           String       @id @default(cuid())
+  name         String
+  address      String       @default("")
+  locationType LocationType @default(office) @map("location_type")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  employees Employee[]
+
+  @@map("work_locations")
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  color     String   @default("#7c3aed")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  employees EmployeeTag[]
+
+  @@map("tags")
+}
+
+model DepartureReason {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("departure_reasons")
+}
+
+model Employee {
+  id             String         @id @default(cuid())
+  name           String
+  active         Boolean        @default(true)
+  workEmail      String         @default("") @map("work_email")
+  workPhone      String         @default("") @map("work_phone")
+  workMobile     String         @default("") @map("work_mobile")
+  avatarUrl      String?        @map("avatar_url")
+  jobTitle       String         @default("") @map("job_title")
+  company        String         @default("")
+  privateEmail   String         @default("") @map("private_email")
+  privatePhone   String         @default("") @map("private_phone")
+  privateAddress String         @default("") @map("private_address")
+  gender         Gender?
+  dateOfBirth    DateTime?      @map("date_of_birth") @db.Date
+  nationality    String         @default("")
+  maritalStatus  MaritalStatus? @map("marital_status")
+  monthlyHours   Int            @default(0) @map("monthly_hours")
+  kanbanState    KanbanState    @default(normal) @map("kanban_state")
+
+  departmentId   String? @map("department_id")
+  jobPositionId  String? @map("job_position_id")
+  managerId      String? @map("manager_id")
+  employeeTypeId String? @map("employee_type_id")
+  workLocationId String? @map("work_location_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  department       Department?  @relation("EmployeeDepartment", fields: [departmentId], references: [id], onDelete: SetNull)
+  jobPosition      JobPosition? @relation(fields: [jobPositionId], references: [id], onDelete: SetNull)
+  manager          Employee?    @relation("EmployeeManager", fields: [managerId], references: [id], onDelete: SetNull)
+  reports          Employee[]   @relation("EmployeeManager")
+  employeeType     EmployeeType? @relation(fields: [employeeTypeId], references: [id], onDelete: SetNull)
+  workLocation     WorkLocation? @relation(fields: [workLocationId], references: [id], onDelete: SetNull)
+  tags             EmployeeTag[]
+  managedDepartments Department[] @relation("DepartmentManager")
+
+  @@index([active])
+  @@index([departmentId])
+  @@index([jobPositionId])
+  @@index([managerId])
+  @@index([employeeTypeId])
+  @@index([workLocationId])
+  @@map("employees")
+}
+
+model EmployeeTag {
+  employeeId String @map("employee_id")
+  tagId      String @map("tag_id")
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  tag      Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([employeeId, tagId])
+  @@map("employee_tags")
+}

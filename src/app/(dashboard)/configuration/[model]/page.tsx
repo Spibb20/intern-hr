@@ -21,10 +21,11 @@ export default async function ConfigurationPage({
   if (!isConfigModel(model)) notFound();
 
   const def = CONFIG_DEFS[model];
-  const rows = getConfigRows(model);
-  const options = getFormOptions();
+  const [rows, options] = await Promise.all([
+    getConfigRows(model),
+    getFormOptions(),
+  ]);
 
-  // Build the field list, injecting select options and related-name maps.
   const relatedLabels: Record<string, Record<string, string>> = {};
   const fields: FieldDef[] = def.fields.map((f) => {
     if (f.type === "select" && f.optionsKey) {
