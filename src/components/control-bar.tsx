@@ -78,12 +78,12 @@ export function ControlBar({
   const canNext = (total ?? 0) > page * pageSize;
 
   return (
-    <div className="flex flex-wrap items-center gap-3 bg-control-bar px-4 py-2.5">
+    <div className="flex flex-wrap items-center gap-3 border-b border-border/70 bg-control-bar/95 px-4 py-3">
       <div className="flex items-center gap-3">
         {newHref && (
           <Link
             href={newHref}
-            className="rounded-md bg-brand-purple px-4 py-1.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+            className="rounded-lg bg-brand-purple px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-opacity hover:opacity-90"
           >
             New
           </Link>
@@ -105,7 +105,7 @@ export function ControlBar({
 
       {searchable && (
         <div className="order-last w-full md:order-0 md:mx-auto md:w-auto md:flex-1 md:max-w-xl">
-          <div className="flex items-center gap-2 rounded-md border border-border bg-background px-3 py-1.5">
+          <div className="flex items-center gap-2 rounded-xl border border-border bg-background/70 px-3 py-2 shadow-sm">
             {isPending ? (
               <Loader2 className="size-4 animate-spin text-muted-foreground" />
             ) : (
@@ -131,7 +131,7 @@ export function ControlBar({
               type="button"
               disabled={!canPrev}
               onClick={() => setParam("page", String(page - 1))}
-              className="rounded-md border border-border p-1 text-muted-foreground transition-colors hover:bg-accent disabled:opacity-40"
+              className="rounded-lg border border-border bg-background/50 p-1.5 text-muted-foreground transition-colors hover:bg-accent disabled:opacity-40"
               aria-label="Previous page"
             >
               <ChevronLeft className="size-4" />
@@ -140,7 +140,7 @@ export function ControlBar({
               type="button"
               disabled={!canNext}
               onClick={() => setParam("page", String(page + 1))}
-              className="rounded-md border border-border p-1 text-muted-foreground transition-colors hover:bg-accent disabled:opacity-40"
+              className="rounded-lg border border-border bg-background/50 p-1.5 text-muted-foreground transition-colors hover:bg-accent disabled:opacity-40"
               aria-label="Next page"
             >
               <ChevronRight className="size-4" />
@@ -149,15 +149,15 @@ export function ControlBar({
         )}
 
         {views && views.length > 0 && (
-          <div className="flex items-center overflow-hidden rounded-md border border-border">
+          <div className="flex items-center overflow-hidden rounded-lg border border-border bg-background/50">
             {views.includes("kanban") && (
               <button
                 type="button"
                 onClick={() => setParam("view", "kanban")}
                 className={cn(
-                  "p-1.5 text-muted-foreground transition-colors hover:bg-accent",
+                  "p-2 text-muted-foreground transition-colors hover:bg-accent",
                   activeView === "kanban" &&
-                    "bg-accent text-brand-teal ring-1 ring-inset ring-brand-teal/60"
+                    "bg-accent text-brand-teal ring-1 ring-inset ring-brand-teal/50"
                 )}
                 aria-label="Kanban view"
               >
@@ -169,9 +169,9 @@ export function ControlBar({
                 type="button"
                 onClick={() => setParam("view", "list")}
                 className={cn(
-                  "p-1.5 text-muted-foreground transition-colors hover:bg-accent",
+                  "p-2 text-muted-foreground transition-colors hover:bg-accent",
                   activeView === "list" &&
-                    "bg-accent text-brand-teal ring-1 ring-inset ring-brand-teal/60"
+                    "bg-accent text-brand-teal ring-1 ring-inset ring-brand-teal/50"
                 )}
                 aria-label="List view"
               >

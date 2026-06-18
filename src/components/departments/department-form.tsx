@@ -71,19 +71,19 @@ export function DepartmentForm({
 
   return (
     <div className="flex flex-col">
-      <div className="flex items-center gap-2 bg-control-bar px-4 py-2.5">
+      <div className="flex items-center gap-2 border-b border-border/70 bg-control-bar/95 px-4 py-3">
         <button
           type="button"
           onClick={handleSave}
           disabled={isPending}
-          className="flex items-center gap-1.5 rounded-md bg-brand-purple px-3 py-1.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="flex items-center gap-1.5 rounded-lg bg-brand-purple px-3.5 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50"
         >
           <Check className="size-4" /> Save
         </button>
         <button
           type="button"
           onClick={() => router.push("/departments")}
-          className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-accent"
+          className="flex items-center gap-1.5 rounded-lg border border-border bg-background/60 px-3.5 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent"
         >
           <X className="size-4" /> Discard
         </button>
@@ -102,12 +102,14 @@ export function DepartmentForm({
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Department Name"
-          className="w-full bg-transparent text-2xl font-semibold outline-none placeholder:text-muted-foreground/50"
+          className="w-full rounded-xl bg-background/35 px-3 py-2 text-2xl font-semibold outline-none placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-brand-purple/15"
         />
 
         <div className="mt-6 flex flex-col gap-5">
-          <div className="grid grid-cols-[140px_1fr] items-center gap-3">
-            <Label className="text-sm font-medium">Manager</Label>
+          <div className="grid grid-cols-1 items-center gap-2 sm:grid-cols-[140px_1fr] sm:gap-3">
+            <Label className="text-sm font-medium text-foreground/105">
+              Manager
+            </Label>
             <Select
               value={managerId ?? "__none"}
               onValueChange={(v) => setManagerId(v === "__none" ? null : v)}
@@ -126,8 +128,10 @@ export function DepartmentForm({
             </Select>
           </div>
 
-          <div className="grid grid-cols-[140px_1fr] items-center gap-3">
-            <Label className="text-sm font-medium">Color</Label>
+          <div className="grid grid-cols-1 items-center gap-2 sm:grid-cols-[140px_1fr] sm:gap-3">
+            <Label className="text-sm font-medium text-foreground/105">
+              Color
+            </Label>
             <div className="flex gap-2">
               {PALETTE.map((c) => (
                 <button

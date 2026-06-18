@@ -191,10 +191,10 @@ export function ConfigManager({
         </Button>
       </div>
 
-      <div className="overflow-hidden rounded-md border border-border">
+      <div className="overflow-hidden rounded-xl border border-border/100 bg-background/45 shadow-sm">
         <Table>
           <TableHeader>
-            <TableRow className="hover:bg-transparent">
+            <TableRow className="bg-control-bar/90 hover:bg-control-bar">
               {fields.map((f) => (
                 <TableHead key={f.key}>{f.label}</TableHead>
               ))}
@@ -291,7 +291,7 @@ export function ConfigManager({
                       onChange={(e) =>
                         setDraft((d) => ({ ...d, [field.key]: e.target.value }))
                       }
-                      className="h-9 w-14 cursor-pointer rounded-md border border-border bg-transparent"
+                      className="h-9 w-14 cursor-pointer rounded-lg border border-border bg-transparent"
                     />
                     <Input
                       value={draft[field.key] || ""}

@@ -24,9 +24,15 @@ export function DepartmentBoard({
 
   function handleDelete(id: string, name: string) {
     startTransition(async () => {
-      await deleteDepartment(id);
-      toast.success(`Deleted ${name}`);
-      router.refresh();
+      try {
+        await deleteDepartment(id);
+        toast.success(`Deleted ${name}`);
+        router.refresh();
+      } catch (err) {
+        toast.error(
+          err instanceof Error ? err.message : "Something went wrong"
+        );
+      }
     });
   }
 
@@ -50,7 +56,7 @@ export function DepartmentBoard({
       {departments.map((dep) => (
         <div
           key={dep.id}
-          className="group relative overflow-hidden rounded-lg border border-border bg-card"
+          className="group relative overflow-hidden rounded-2xl border border-border/100 bg-background/55 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
           style={{ borderLeft: `3px solid ${dep.color}` }}
         >
           <div className="flex items-start justify-between p-4">
@@ -67,7 +73,7 @@ export function DepartmentBoard({
             <DropdownMenu>
               <DropdownMenuTrigger
                 aria-label="Department options"
-                className="rounded p-1 text-muted-foreground opacity-0 transition-opacity hover:bg-accent group-hover:opacity-100"
+                className="rounded-lg p-1 text-muted-foreground opacity-0 transition-opacity hover:bg-accent group-hover:opacity-100"
               >
                 <MoreVertical className="size-4" />
               </DropdownMenuTrigger>
@@ -91,7 +97,7 @@ export function DepartmentBoard({
           <div className="px-4 pb-4">
             <Link
               href={`/employees?department=${dep.id}`}
-              className="inline-flex rounded-md bg-brand-purple/30 px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-brand-purple/50"
+              className="inline-flex rounded-lg bg-brand-purple/15 px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-brand-purple/25"
             >
               {dep.employeeCount} Employees
             </Link>

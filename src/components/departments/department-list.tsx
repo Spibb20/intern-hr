@@ -23,10 +23,10 @@ export function DepartmentList({
   }
   return (
     <div className="p-4">
-      <div className="overflow-hidden rounded-lg border border-border">
+      <div className="overflow-hidden rounded-xl border border-border/100 bg-background/45 shadow-sm">
         <Table>
           <TableHeader>
-            <TableRow className="bg-control-bar hover:bg-control-bar">
+            <TableRow className="bg-control-bar/90 hover:bg-control-bar">
               <TableHead>Department</TableHead>
               <TableHead>Manager</TableHead>
               <TableHead className="text-right">Employees</TableHead>

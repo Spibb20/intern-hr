@@ -3,6 +3,8 @@ import { DepartmentBoard } from "@/components/departments/department-board";
 import { DepartmentList } from "@/components/departments/department-list";
 import { getDepartmentsWithCounts } from "@/lib/data/queries";
 
+export const dynamic = "force-dynamic";
+
 export default async function DepartmentsPage({
   searchParams,
 }: {

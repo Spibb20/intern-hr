@@ -4,6 +4,8 @@ import { EmployeeKanban } from "@/components/employees/employee-kanban";
 import { EmployeeList } from "@/components/employees/employee-list";
 import { getDepartmentsWithCounts, getEmployees } from "@/lib/data/queries";
 
+export const dynamic = "force-dynamic";
+
 const PAGE_SIZE = 20;
 
 export default async function EmployeesPage({

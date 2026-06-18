@@ -24,10 +24,10 @@ export function EmployeeList({
 
   return (
     <div className="p-4">
-      <div className="overflow-hidden rounded-lg border border-border">
+      <div className="overflow-hidden rounded-xl border border-border bg-background/45 shadow-sm">
         <Table>
           <TableHeader>
-            <TableRow className="bg-control-bar hover:bg-control-bar">
+            <TableRow className="bg-control-bar/90 hover:bg-control-bar">
               <TableHead>Name</TableHead>
               <TableHead>Job Position</TableHead>
               <TableHead className="hidden md:table-cell">Work Email</TableHead>
@@ -47,7 +47,7 @@ export function EmployeeList({
                   </Link>
                 </TableCell>
                 <TableCell className="text-muted-foreground">
-                  {employee.jobTitle || "—"}
+                  {employee.jobPosition?.name || employee.jobTitle || "—"}
                 </TableCell>
                 <TableCell className="hidden text-muted-foreground md:table-cell">
                   {employee.workEmail || "—"}

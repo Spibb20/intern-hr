@@ -8,6 +8,8 @@ import { CONFIG_DEFS } from "@/lib/config-defs";
 import { getConfigRows, getFormOptions } from "@/lib/data/queries";
 import type { ConfigModel } from "@/lib/types";
 
+export const dynamic = "force-dynamic";
+
 function isConfigModel(value: string): value is ConfigModel {
   return value in CONFIG_DEFS;
 }
@@ -29,7 +31,7 @@ export default async function ConfigurationPage({
   const relatedLabels: Record<string, Record<string, string>> = {};
   const fields: FieldDef[] = def.fields.map((f) => {
     if (f.type === "select" && f.optionsKey) {
-      const opts = options[f.optionsKey];
+      const opts = options[f.optionsKey] as { id: string; name: string }[];
       relatedLabels[f.key] = Object.fromEntries(
         opts.map((o) => [o.id, o.name])
       );

@@ -34,7 +34,17 @@ function emptyToNull(value?: string | null) {
 }
 
 function parseDate(value?: string) {
-  return value ? new Date(`${value}T00:00:00.000Z`) : null;
+  if (!value) return null;
+  const date = new Date(`${value}T00:00:00.000Z`);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function uniqueIds(ids?: string[]) {
+  return [...new Set((ids ?? []).filter(Boolean))];
+}
+
+function locationType(value: unknown): "office" | "home" | "other" {
+  return value === "home" || value === "other" ? value : "office";
 }
 
 function normalize(input: EmployeeInput) {
@@ -77,7 +87,7 @@ export async function createEmployee(input: EmployeeInput): Promise<string> {
       ...normalize(input),
       active: true,
       tags: {
-        create: (input.tagIds ?? []).map((tagId) => ({
+        create: uniqueIds(input.tagIds).map((tagId) => ({
           tag: { connect: { id: tagId } },
         })),
       },
@@ -102,7 +112,7 @@ export async function updateEmployee(
       data: {
         ...normalize(input),
         tags: {
-          create: (input.tagIds ?? []).map((tagId) => ({
+          create: uniqueIds(input.tagIds).map((tagId) => ({
             tag: { connect: { id: tagId } },
           })),
         },
@@ -207,7 +217,7 @@ export async function createConfigItem(
         data: {
           name,
           address: String(data.address ?? ""),
-          locationType: (data.locationType as any) || "office",
+          locationType: locationType(data.locationType),
         },
         select: { id: true },
       });
@@ -268,7 +278,7 @@ export async function updateConfigItem(
             ? { address: String(data.address ?? "") }
             : {}),
           ...(data.locationType !== undefined
-            ? { locationType: data.locationType as any }
+            ? { locationType: locationType(data.locationType) }
             : {}),
         },
       });

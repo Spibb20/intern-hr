@@ -2,13 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Bell,
-  MessageSquare,
-  Settings2,
-  Sparkles,
-  UsersRound,
-} from "lucide-react";
+import { Bell, MessageSquare, Settings2, UsersRound } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
@@ -18,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const configSections: {
   label: string;
@@ -46,8 +41,8 @@ function NavLink({ href, label }: { href: string; label: string }) {
     <Link
       href={href}
       className={cn(
-        "rounded-md px-3 py-1.5 text-sm font-medium text-navbar-foreground/80 transition-colors hover:bg-white/10",
-        active && "bg-white/10 text-navbar-foreground"
+        "rounded-md px-3 py-1.5 text-sm font-medium text-navbar-foreground/100 transition-colors hover:bg-white/10",
+        active && "bg-white/15 text-navbar-foreground shadow-inner"
       )}
     >
       {label}
@@ -62,7 +57,7 @@ export function AppNavbar() {
     pathname.startsWith("/departments");
 
   return (
-    <header className="sticky top-0 z-40 flex h-12 items-center gap-1 bg-navbar px-3 text-navbar-foreground">
+    <header className="sticky top-0 z-40 flex h-12 items-center gap-1 border-b border-white/10 bg-navbar px-3 text-navbar-foreground shadow-sm">
       <Link href="/employees" className="mr-2 flex items-center gap-2">
         <span className="flex size-7 items-center justify-center rounded-md bg-brand-purple text-primary-foreground">
           <UsersRound className="size-4" />
@@ -77,7 +72,7 @@ export function AppNavbar() {
         <DropdownMenu>
           <DropdownMenuTrigger
             className={cn(
-              "rounded-md px-3 py-1.5 text-sm font-medium text-navbar-foreground/80 outline-none transition-colors hover:bg-white/10 data-[state=open]:bg-white/15",
+              "rounded-md px-3 py-1.5 text-sm font-medium text-navbar-foreground/100 outline-none transition-colors hover:bg-white/10 data-[state=open]:bg-white/15",
               configActive && "text-navbar-foreground"
             )}
           >
@@ -103,6 +98,7 @@ export function AppNavbar() {
       </nav>
 
       <div className="ml-auto flex items-center gap-3">
+        <ThemeToggle />
         <div className="hidden items-center gap-3 text-navbar-foreground/70 sm:flex">
           <MessageSquare className="size-4.5" />
           <Bell className="size-4.5" />

@@ -112,6 +112,15 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
     }));
   }
 
+  function handleJobPositionChange(value: string | null) {
+    const selected = formOptions.jobPositions.find((job) => job.id === value);
+    setForm((prev) => ({
+      ...prev,
+      jobPositionId: value,
+      jobTitle: selected?.name ?? (value ? prev.jobTitle : ""),
+    }));
+  }
+
   function onPickAvatar(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -147,13 +156,13 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
 
   return (
     <div className="flex flex-col">
-      <div className="flex flex-wrap items-center gap-3 bg-control-bar px-4 py-2.5">
+      <div className="flex flex-wrap items-center gap-3 border-b border-border/70 bg-control-bar/95 px-4 py-3">
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={handleSave}
             disabled={isPending}
-            className="flex items-center gap-1.5 rounded-md bg-brand-purple px-3 py-1.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg bg-brand-purple px-3.5 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50"
           >
             <Check className="size-4" /> Save
           </button>
@@ -162,7 +171,7 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
             onClick={() =>
               router.push(employee ? `/employees/${employee.id}` : "/employees")
             }
-            className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-accent"
+            className="flex items-center gap-1.5 rounded-lg border border-border bg-background/60 px-3.5 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent"
           >
             <X className="size-4" /> Discard
           </button>
@@ -186,7 +195,7 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
             return (
               <div
                 key={btn.label}
-                className="flex items-center gap-2 rounded-md border border-border bg-card px-3 py-1.5"
+                className="flex items-center gap-2 rounded-xl border border-border bg-background/55 px-3 py-2 shadow-sm"
               >
                 <Icon className="size-4 text-brand-teal" />
                 <div className="flex flex-col leading-tight">
@@ -206,7 +215,7 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
       <div className="mx-auto w-full max-w-5xl px-4 py-6">
         <button
           type="button"
-          className="mb-6 rounded-md bg-brand-purple px-3 py-1.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+          className="mb-6 rounded-lg bg-brand-purple px-3.5 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-opacity hover:opacity-90"
           onClick={() =>
             toast.info("User account creation is a placeholder in this demo")
           }
@@ -226,7 +235,7 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="flex size-36 items-center justify-center overflow-hidden rounded-md border border-border bg-muted text-muted-foreground transition-colors hover:bg-accent"
+              className="flex size-36 items-center justify-center overflow-hidden rounded-2xl border border-border bg-muted text-muted-foreground shadow-sm transition-colors hover:bg-accent"
               aria-label="Upload photo"
             >
               {form.avatarUrl ? (
@@ -247,7 +256,7 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
               value={form.name}
               onChange={(e) => set("name", e.target.value)}
               placeholder="Employee's Name (e.g. John Doe, ...)"
-              className="w-full bg-transparent text-3xl font-semibold text-foreground outline-none placeholder:text-muted-foreground/50"
+              className="w-full rounded-xl bg-background/35 px-3 py-2 text-3xl font-semibold text-foreground outline-none placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-brand-purple/15"
             />
             <div className="mt-4 flex flex-col gap-2.5">
               <HeaderField icon={Mail}>
@@ -255,7 +264,7 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
                   value={form.workEmail}
                   onChange={(e) => set("workEmail", e.target.value)}
                   placeholder="e.g. johndoe@example.com"
-                  className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                  className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground/70"
                 />
               </HeaderField>
               <HeaderField icon={Phone}>
@@ -263,7 +272,7 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
                   value={form.workPhone}
                   onChange={(e) => set("workPhone", e.target.value)}
                   placeholder="Work Phone"
-                  className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                  className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground/70"
                 />
               </HeaderField>
               <HeaderField icon={Smartphone}>
@@ -271,7 +280,7 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
                   value={form.workMobile}
                   onChange={(e) => set("workMobile", e.target.value)}
                   placeholder="Work Mobile"
-                  className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                  className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground/70"
                 />
               </HeaderField>
               <HeaderField icon={TagIcon}>
@@ -284,10 +293,10 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
                         key={tag.id}
                         onClick={() => toggleTag(tag.id)}
                         className={cn(
-                          "rounded px-2 py-0.5 text-xs transition-colors",
+                          "rounded-full px-2.5 py-1 text-xs transition-colors",
                           active
                             ? ""
-                            : "border border-dashed border-border text-muted-foreground"
+                            : "border border-dashed border-border bg-background/45 text-muted-foreground hover:bg-accent"
                         )}
                         style={
                           active
@@ -321,7 +330,7 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
                 <TabsTrigger
                   key={tab}
                   value={tab}
-                  className="rounded-none border-b-2 border-transparent capitalize data-[state=active]:border-brand-purple data-[state=active]:bg-transparent data-[state=active]:text-brand-purple data-[state=active]:shadow-none"
+                  className="rounded-t-lg border-b-2 border-transparent px-4 py-2 capitalize text-muted-foreground data-[state=active]:border-brand-purple data-[state=active]:bg-brand-purple/10 data-[state=active]:text-brand-purple data-[state=active]:shadow-none"
                 >
                   {tab}
                 </TabsTrigger>
@@ -340,8 +349,14 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
                   options={formOptions.departments}
                   onChange={(v) => set("departmentId", v)}
                 />
-                <FieldText
+                <FieldSelect
                   label="Job Position"
+                  value={form.jobPositionId}
+                  options={formOptions.jobPositions}
+                  onChange={handleJobPositionChange}
+                />
+                <FieldText
+                  label="Job Title"
                   value={form.jobTitle ?? ""}
                   placeholder="e.g. Sales Manager"
                   onChange={(v) => set("jobTitle", v)}
@@ -376,7 +391,7 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
                     ? `Reports to ${
                         formOptions.managers.find(
                           (m) => m.id === form.managerId
-                        )?.name
+                        )?.name ?? "selected manager"
                       }`
                     : "No manager set."}
                 </div>
@@ -427,13 +442,15 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
                     { id: "other", name: "Other" },
                   ]}
                 />
-                <div className="grid grid-cols-[140px_1fr] items-center gap-3">
-                  <Label className="text-sm font-medium">Date of Birth</Label>
+                <div className="grid grid-cols-1 items-center gap-2 sm:grid-cols-[140px_1fr] sm:gap-3">
+                  <Label className="text-sm font-medium text-foreground/105">
+                    Date of Birth
+                  </Label>
                   <input
                     type="date"
                     value={form.dateOfBirth ?? ""}
                     onChange={(e) => set("dateOfBirth", e.target.value)}
-                    className="rounded-md border border-border bg-background px-3 py-1.5 text-sm outline-none focus:ring-1 focus:ring-ring scheme-dark"
+                    className="soft-input"
                   />
                 </div>
                 <FieldText
@@ -468,13 +485,15 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
                 options={formOptions.employeeTypes}
                 onChange={(v) => set("employeeTypeId", v)}
               />
-              <div className="grid grid-cols-[140px_1fr] items-center gap-3">
-                <Label className="text-sm font-medium">Monthly Hours</Label>
+              <div className="grid grid-cols-1 items-center gap-2 sm:grid-cols-[140px_1fr] sm:gap-3">
+                <Label className="text-sm font-medium text-foreground/105">
+                  Monthly Hours
+                </Label>
                 <input
                   type="number"
                   value={form.monthlyHours ?? 0}
                   onChange={(e) => set("monthlyHours", Number(e.target.value))}
-                  className="rounded-md border border-border bg-background px-3 py-1.5 text-sm outline-none focus:ring-1 focus:ring-ring"
+                  className="soft-input"
                 />
               </div>
             </div>
@@ -520,7 +539,7 @@ function HeaderField({
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="border-b border-border pb-1 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+    <h2 className="border-b border-border pb-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
       {children}
     </h2>
   );
@@ -538,13 +557,13 @@ function FieldText({
   onChange: (v: string) => void;
 }) {
   return (
-    <div className="grid grid-cols-[140px_1fr] items-center gap-3">
-      <Label className="text-sm font-medium">{label}</Label>
+    <div className="grid grid-cols-1 items-center gap-2 sm:grid-cols-[140px_1fr] sm:gap-3">
+      <Label className="text-sm font-medium text-foreground/105">{label}</Label>
       <input
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="rounded-md border border-border bg-background px-3 py-1.5 text-sm outline-none placeholder:text-muted-foreground focus:ring-1 focus:ring-ring"
+        className="soft-input"
       />
     </div>
   );
@@ -562,13 +581,13 @@ function FieldSelect({
   onChange: (v: string | null) => void;
 }) {
   return (
-    <div className="grid grid-cols-[140px_1fr] items-center gap-3">
-      <Label className="text-sm font-medium">{label}</Label>
+    <div className="grid grid-cols-1 items-center gap-2 sm:grid-cols-[140px_1fr] sm:gap-3">
+      <Label className="text-sm font-medium text-foreground/105">{label}</Label>
       <Select
         value={value ?? "__none"}
         onValueChange={(v) => onChange(v === "__none" ? null : v)}
       >
-        <SelectTrigger className="w-full">
+        <SelectTrigger className="w-full bg-background/70">
           <SelectValue placeholder="Select..." />
         </SelectTrigger>
         <SelectContent>
@@ -596,13 +615,13 @@ function FieldSelectStatic({
   onChange: (v: string) => void;
 }) {
   return (
-    <div className="grid grid-cols-[140px_1fr] items-center gap-3">
-      <Label className="text-sm font-medium">{label}</Label>
+    <div className="grid grid-cols-1 items-center gap-2 sm:grid-cols-[140px_1fr] sm:gap-3">
+      <Label className="text-sm font-medium text-foreground/105">{label}</Label>
       <Select
         value={value || "__none"}
         onValueChange={(v) => onChange(v === "__none" || v == null ? "" : v)}
       >
-        <SelectTrigger className="w-full">
+        <SelectTrigger className="w-full bg-background/70">
           <SelectValue placeholder="Select..." />
         </SelectTrigger>
         <SelectContent>

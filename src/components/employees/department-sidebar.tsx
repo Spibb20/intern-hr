@@ -23,7 +23,7 @@ export function DepartmentSidebar({
   }
 
   return (
-    <aside className="hidden w-60 shrink-0 border-r border-border px-3 py-4 md:block">
+    <aside className="hidden w-60 shrink-0 border-r border-border/70 bg-background/35 px-3 py-4 md:block">
       <div className="mb-2 flex items-center gap-2 px-2 text-xs font-semibold uppercase tracking-wide text-brand-teal">
         <UsersRound className="size-4" />
         Department
@@ -32,7 +32,7 @@ export function DepartmentSidebar({
         <Link
           href={hrefFor()}
           className={cn(
-            "rounded-md px-3 py-2 transition-colors hover:bg-accent",
+            "rounded-lg px-3 py-2 transition-colors hover:bg-accent",
             !current && "bg-accent font-medium"
           )}
         >
@@ -43,7 +43,7 @@ export function DepartmentSidebar({
             key={dep.id}
             href={hrefFor(dep.id)}
             className={cn(
-              "flex items-center justify-between rounded-md px-3 py-2 transition-colors hover:bg-accent",
+              "flex items-center justify-between rounded-lg px-3 py-2 transition-colors hover:bg-accent",
               current === dep.id && "bg-accent font-medium"
             )}
           >

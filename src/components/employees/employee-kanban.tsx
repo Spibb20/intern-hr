@@ -33,9 +33,9 @@ export function EmployeeKanban({
         <Link
           key={employee.id}
           href={`/employees/${employee.id}`}
-          className="group flex overflow-hidden rounded-lg border border-border bg-card transition-colors hover:border-brand-teal/60"
+          className="group flex overflow-hidden rounded-2xl border border-border/100 bg-background/55 shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand-teal/60 hover:shadow-md"
         >
-          <div className="size-28 shrink-0 bg-muted">
+          <div className="size-28 shrink-0 bg-muted/100">
             <Avatar className="size-28 rounded-none">
               <AvatarImage
                 src={employee.avatarUrl ?? undefined}
@@ -61,10 +61,12 @@ export function EmployeeKanban({
               />
             </div>
 
-            {employee.jobTitle && (
+            {(employee.jobPosition?.name || employee.jobTitle) && (
               <p className="flex items-center gap-1.5 truncate text-sm text-muted-foreground">
                 <Briefcase className="size-3.5 shrink-0 text-brand-purple" />
-                <span className="truncate">{employee.jobTitle}</span>
+                <span className="truncate">
+                  {employee.jobPosition?.name || employee.jobTitle}
+                </span>
               </p>
             )}
             {employee.workEmail && (
@@ -85,7 +87,7 @@ export function EmployeeKanban({
                 {employee.tags.map((tag) => (
                   <span
                     key={tag.id}
-                    className="rounded px-1.5 py-0.5 text-xs"
+                    className="rounded-full px-2 py-0.5 text-xs"
                     style={{
                       backgroundColor: `${tag.color}33`,
                       color: tag.color,

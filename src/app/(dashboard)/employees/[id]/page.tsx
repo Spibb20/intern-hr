@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { EmployeeForm } from "@/components/employees/employee-form";
 import { getEmployee, getFormOptions } from "@/lib/data/queries";
 
+export const dynamic = "force-dynamic";
+
 export default async function EmployeeDetailPage({
   params,
 }: {
