@@ -55,10 +55,10 @@ interface EmployeeFormProps {
 }
 
 const smartButtons = [
-  { icon: DollarSign, label: "Salary Adjustment", value: "New" },
-  { icon: CalendarClock, label: "Time Off", value: "" },
-  { icon: Clock, label: "Monthly Hours", valueKey: "monthlyHours" },
-  { icon: History, label: "History", value: "0" },
+  { icon: DollarSign, label: "Цалингийн хүлээлт", value: "" },
+  { icon: CalendarClock, label: "Амралт/Чөлөө", value: "" },
+  { icon: Clock, label: "Ажилласан цаг/сар", valueKey: "monthlyHours" },
+  { icon: History, label: "Түүх", value: "0" },
 ];
 
 export function EmployeeForm({ options, employee }: EmployeeFormProps) {
@@ -131,7 +131,7 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
 
   function handleSave() {
     if (!form.name.trim()) {
-      toast.error("Employee's name is required");
+      toast.error("Ажилчны нэр шаардлагатай");
       return;
     }
     startTransition(async () => {
@@ -162,25 +162,25 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
             type="button"
             onClick={handleSave}
             disabled={isPending}
-            className="flex items-center gap-1.5 rounded-lg bg-brand-purple px-3.5 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg bg-accent-foreground px-3.5 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50"
           >
-            <Check className="size-4" /> Save
+            <Check className="size-4" /> Хадгалах
           </button>
           <button
             type="button"
             onClick={() =>
               router.push(employee ? `/employees/${employee.id}` : "/employees")
             }
-            className="flex items-center gap-1.5 rounded-lg border border-border bg-background/60 px-3.5 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent"
+            className="flex items-center gap-1.5 rounded-lg border border-border bg-background/80 px-3.5 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent"
           >
-            <X className="size-4" /> Discard
+            <X className="size-4" /> Цуцлах
           </button>
           <span className="ml-1 flex flex-col leading-tight">
             <span className="text-[13px] font-medium text-brand-teal">
-              Employees
+              Ажилчид
             </span>
             <span className="text-xs text-muted-foreground">
-              {employee ? employee.name : "New"}
+              {employee ? employee.name : "Шинээр элсэх"}
             </span>
           </span>
         </div>
@@ -215,12 +215,12 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
       <div className="mx-auto w-full max-w-5xl px-4 py-6">
         <button
           type="button"
-          className="mb-6 rounded-lg bg-brand-purple px-3.5 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-opacity hover:opacity-90"
+          className="mb-6 rounded-lg bg-accent-foreground/80 px-3.5 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-opacity hover:opacity-90"
           onClick={() =>
             toast.info("User account creation is a placeholder in this demo")
           }
         >
-          Create User
+          Хэрэглэгч нээх
         </button>
 
         <div className="flex flex-col gap-6 md:flex-row">
@@ -239,7 +239,6 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
               aria-label="Upload photo"
             >
               {form.avatarUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={form.avatarUrl}
                   alt=""
@@ -255,7 +254,7 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
             <input
               value={form.name}
               onChange={(e) => set("name", e.target.value)}
-              placeholder="Employee's Name (e.g. John Doe, ...)"
+              placeholder="Овог нэр оруулна уу."
               className="w-full rounded-xl bg-background/35 px-3 py-2 text-3xl font-semibold text-foreground outline-none placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-brand-purple/15"
             />
             <div className="mt-4 flex flex-col gap-2.5">
@@ -263,7 +262,7 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
                 <input
                   value={form.workEmail}
                   onChange={(e) => set("workEmail", e.target.value)}
-                  placeholder="e.g. johndoe@example.com"
+                  placeholder="имейл@example.com"
                   className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground/70"
                 />
               </HeaderField>
@@ -271,7 +270,7 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
                 <input
                   value={form.workPhone}
                   onChange={(e) => set("workPhone", e.target.value)}
-                  placeholder="Work Phone"
+                  placeholder="Ажлын утас"
                   className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground/70"
                 />
               </HeaderField>
@@ -279,7 +278,7 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
                 <input
                   value={form.workMobile}
                   onChange={(e) => set("workMobile", e.target.value)}
-                  placeholder="Work Mobile"
+                  placeholder="Дугаар"
                   className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground/70"
                 />
               </HeaderField>
@@ -313,7 +312,7 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
                   })}
                   {formOptions.tags.length === 0 && (
                     <span className="text-sm text-muted-foreground">
-                      e.g. Founder, Motorized, ...
+                      Үүсгэн байгуулагч, CEO гэх мэт...
                     </span>
                   )}
                 </div>
@@ -322,7 +321,6 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
           </div>
         </div>
 
-        {/* Tabs */}
         <Tabs defaultValue="work" className="mt-8">
           <TabsList className="w-full justify-start gap-1 rounded-none border-b border-border bg-transparent p-0">
             {["work", "resume", "personal", "payroll", "settings"].map(
@@ -338,31 +336,30 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
             )}
           </TabsList>
 
-          {/* WORK */}
           <TabsContent value="work" className="pt-6">
             <div className="grid gap-10 md:grid-cols-2">
               <div className="flex flex-col gap-4">
-                <SectionTitle>Work</SectionTitle>
+                <SectionTitle>Албан тушаалын мэдээлэл</SectionTitle>
                 <FieldSelect
-                  label="Department"
+                  label="Хэлтэс"
                   value={form.departmentId}
                   options={formOptions.departments}
                   onChange={(v) => set("departmentId", v)}
                 />
                 <FieldSelect
-                  label="Job Position"
+                  label="Албан Тушаал"
                   value={form.jobPositionId}
                   options={formOptions.jobPositions}
                   onChange={handleJobPositionChange}
                 />
                 <FieldText
-                  label="Job Title"
+                  label="Үүрэг"
                   value={form.jobTitle ?? ""}
-                  placeholder="e.g. Sales Manager"
+                  placeholder="албан тушаалын тайлбар"
                   onChange={(v) => set("jobTitle", v)}
                 />
                 <FieldSelect
-                  label="Manager"
+                  label="Удирдах албан тушаалтан"
                   value={form.managerId}
                   options={formOptions.managers.filter(
                     (m) => m.id !== employee?.id
@@ -370,13 +367,13 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
                   onChange={(v) => set("managerId", v)}
                 />
                 <FieldSelect
-                  label="Work Location"
+                  label="Ажлын байрны байршил"
                   value={form.workLocationId}
                   options={formOptions.workLocations}
                   onChange={(v) => set("workLocationId", v)}
                 />
                 <FieldText
-                  label="Company"
+                  label="Ажил олгогч"
                   value={form.company ?? ""}
                   onChange={(v) => set("company", v)}
                 />
@@ -384,7 +381,7 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
               <div className="flex flex-col gap-3">
                 <SectionTitle>Organization Chart</SectionTitle>
                 <p className="text-sm italic text-muted-foreground">
-                  Set a manager or reports to show in org chart.
+                  Менежер эсвэл холбогдох удирах албан тушаалтан.
                 </p>
                 <div className="rounded-md border border-dashed border-border p-4 text-sm text-muted-foreground">
                   {form.managerId
@@ -393,7 +390,7 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
                           (m) => m.id === form.managerId
                         )?.name ?? "selected manager"
                       }`
-                    : "No manager set."}
+                    : "Холбогдох албан тушаалтан байхгүй байна."}
                 </div>
               </div>
             </div>

@@ -47,7 +47,7 @@ export function DepartmentForm({
 
   function handleSave() {
     if (!name.trim()) {
-      toast.error("Department name is required");
+      toast.error("Хэлтэсийн нэршил оруулах шаардлагатай");
       return;
     }
     startTransition(async () => {
@@ -76,23 +76,23 @@ export function DepartmentForm({
           type="button"
           onClick={handleSave}
           disabled={isPending}
-          className="flex items-center gap-1.5 rounded-lg bg-brand-purple px-3.5 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="flex items-center gap-1.5 rounded-lg bg-accent-foreground px-3.5 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50"
         >
-          <Check className="size-4" /> Save
+          <Check className="size-4" /> Хадгалах
         </button>
         <button
           type="button"
           onClick={() => router.push("/departments")}
           className="flex items-center gap-1.5 rounded-lg border border-border bg-background/60 px-3.5 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent"
         >
-          <X className="size-4" /> Discard
+          <X className="size-4" /> Устгах
         </button>
         <span className="ml-1 flex flex-col leading-tight">
           <span className="text-[13px] font-medium text-brand-teal">
-            Departments
+            Хэлтэс
           </span>
           <span className="text-xs text-muted-foreground">
-            {department ? department.name : "New"}
+            {department ? department.name : "Шинээр нэмэх"}
           </span>
         </span>
       </div>
@@ -101,14 +101,14 @@ export function DepartmentForm({
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Department Name"
+          placeholder="Шинээр нэмэх хэлтэсийн нэршилийг оруулна уу."
           className="w-full rounded-xl bg-background/35 px-3 py-2 text-2xl font-semibold outline-none placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-brand-purple/15"
         />
 
         <div className="mt-6 flex flex-col gap-5">
           <div className="grid grid-cols-1 items-center gap-2 sm:grid-cols-[140px_1fr] sm:gap-3">
             <Label className="text-sm font-medium text-foreground/105">
-              Manager
+              Удирдлага
             </Label>
             <Select
               value={managerId ?? "__none"}
@@ -130,7 +130,7 @@ export function DepartmentForm({
 
           <div className="grid grid-cols-1 items-center gap-2 sm:grid-cols-[140px_1fr] sm:gap-3">
             <Label className="text-sm font-medium text-foreground/105">
-              Color
+              Хэлтэсийг тодорхойлох өнгө
             </Label>
             <div className="flex gap-2">
               {PALETTE.map((c) => (

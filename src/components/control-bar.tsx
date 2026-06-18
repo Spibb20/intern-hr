@@ -83,9 +83,9 @@ export function ControlBar({
         {newHref && (
           <Link
             href={newHref}
-            className="rounded-lg bg-brand-purple px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-opacity hover:opacity-90"
+            className="rounded-lg bg-accent-foreground px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-opacity hover:opacity-90"
           >
-            New
+            Шинээр нээх
           </Link>
         )}
         <div className="flex flex-col leading-tight">
@@ -114,7 +114,7 @@ export function ControlBar({
             <input
               value={term}
               onChange={(e) => setTerm(e.target.value)}
-              placeholder="Search..."
+              placeholder="Хайх..."
               className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
             />
           </div>

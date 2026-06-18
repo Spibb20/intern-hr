@@ -33,9 +33,9 @@ export function EmployeeKanban({
         <Link
           key={employee.id}
           href={`/employees/${employee.id}`}
-          className="group flex overflow-hidden rounded-2xl border border-border/100 bg-background/55 shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand-teal/60 hover:shadow-md"
+          className="group flex overflow-hidden rounded-2xl border border-border bg-background/55 shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand-teal/60 hover:shadow-md"
         >
-          <div className="size-28 shrink-0 bg-muted/100">
+          <div className="size-28 shrink-0 bg-muted">
             <Avatar className="size-28 rounded-none">
               <AvatarImage
                 src={employee.avatarUrl ?? undefined}
@@ -109,12 +109,12 @@ export function EmployeeKanban({
 function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center gap-2 py-24 text-center text-muted-foreground">
-      <p className="text-sm">No employees found.</p>
+      <p className="text-sm">Одоогоор ажилчид байхгүй.</p>
       <Link
         href="/employees/new"
         className="text-sm text-brand-teal hover:underline"
       >
-        Create a new employee
+        Шинэ ажилтан нэмэх
       </Link>
     </div>
   );

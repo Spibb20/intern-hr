@@ -39,12 +39,12 @@ export function DepartmentBoard({
   if (departments.length === 0) {
     return (
       <div className="py-24 text-center text-sm text-muted-foreground">
-        No departments yet.{" "}
+        Одоогоор салбар байхгүа байна.{" "}
         <Link
           href="/departments/new"
           className="text-brand-teal hover:underline"
         >
-          Create one
+          Хэлтэс шинээр нээх
         </Link>
         .
       </div>
@@ -56,7 +56,7 @@ export function DepartmentBoard({
       {departments.map((dep) => (
         <div
           key={dep.id}
-          className="group relative overflow-hidden rounded-2xl border border-border/100 bg-background/55 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+          className="group relative overflow-hidden rounded-2xl border border-border bg-background/55 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
           style={{ borderLeft: `3px solid ${dep.color}` }}
         >
           <div className="flex items-start justify-between p-4">
@@ -79,7 +79,7 @@ export function DepartmentBoard({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
-                  <Link href={`/departments/${dep.id}`}>Edit</Link>
+                  <Link href={`/departments/${dep.id}`}>Засах</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   variant="destructive"
@@ -89,7 +89,7 @@ export function DepartmentBoard({
                     handleDelete(dep.id, dep.name);
                   }}
                 >
-                  <Trash2 className="size-4" /> Delete
+                  <Trash2 className="size-4" /> Устгах
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -99,7 +99,7 @@ export function DepartmentBoard({
               href={`/employees?department=${dep.id}`}
               className="inline-flex rounded-lg bg-brand-purple/15 px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-brand-purple/25"
             >
-              {dep.employeeCount} Employees
+              Уг хэлтэст байгаа ажилчдын тоо: {dep.employeeCount}
             </Link>
           </div>
         </div>

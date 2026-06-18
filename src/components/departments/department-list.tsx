@@ -17,19 +17,19 @@ export function DepartmentList({
   if (departments.length === 0) {
     return (
       <div className="py-24 text-center text-sm text-muted-foreground">
-        No departments yet.
+        Одоогоор ямар нэг хэлтэс байхгүй байна.
       </div>
     );
   }
   return (
     <div className="p-4">
-      <div className="overflow-hidden rounded-xl border border-border/100 bg-background/45 shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-border bg-background/45 shadow-sm">
         <Table>
           <TableHeader>
             <TableRow className="bg-control-bar/90 hover:bg-control-bar">
-              <TableHead>Department</TableHead>
-              <TableHead>Manager</TableHead>
-              <TableHead className="text-right">Employees</TableHead>
+              <TableHead>Хэлтэс</TableHead>
+              <TableHead>Удирдах албан тушаалтан</TableHead>
+              <TableHead className="text-right">Ажилчид</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

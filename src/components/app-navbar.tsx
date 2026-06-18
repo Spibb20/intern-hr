@@ -41,7 +41,7 @@ function NavLink({ href, label }: { href: string; label: string }) {
     <Link
       href={href}
       className={cn(
-        "rounded-md px-3 py-1.5 text-sm font-medium text-navbar-foreground/100 transition-colors hover:bg-white/10",
+        "rounded-md px-3 py-1.5 text-sm font-medium text-navbar-foreground transition-colors hover:bg-white/10",
         active && "bg-white/15 text-navbar-foreground shadow-inner"
       )}
     >
@@ -72,7 +72,7 @@ export function AppNavbar() {
         <DropdownMenu>
           <DropdownMenuTrigger
             className={cn(
-              "rounded-md px-3 py-1.5 text-sm font-medium text-navbar-foreground/100 outline-none transition-colors hover:bg-white/10 data-[state=open]:bg-white/15",
+              "rounded-md px-3 py-1.5 text-sm font-medium text-navbar-foreground outline-none transition-colors hover:bg-white/10 data-[state=open]:bg-white/15",
               configActive && "text-navbar-foreground"
             )}
           >

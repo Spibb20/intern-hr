@@ -191,7 +191,7 @@ export function ConfigManager({
         </Button>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-border/100 bg-background/45 shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-border bg-background/45 shadow-sm">
         <Table>
           <TableHeader>
             <TableRow className="bg-control-bar/90 hover:bg-control-bar">

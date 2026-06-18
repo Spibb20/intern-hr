@@ -26,7 +26,7 @@ export function DepartmentSidebar({
     <aside className="hidden w-60 shrink-0 border-r border-border/70 bg-background/35 px-3 py-4 md:block">
       <div className="mb-2 flex items-center gap-2 px-2 text-xs font-semibold uppercase tracking-wide text-brand-teal">
         <UsersRound className="size-4" />
-        Department
+        Хэлтэс
       </div>
       <nav className="flex flex-col gap-0.5 text-sm">
         <Link
@@ -36,7 +36,7 @@ export function DepartmentSidebar({
             !current && "bg-accent font-medium"
           )}
         >
-          All
+          Бүгд
         </Link>
         {departments.map((dep) => (
           <Link
