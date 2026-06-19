@@ -316,10 +316,10 @@ export function ConfigManager({
           </div>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setDialogOpen(false)}>
-              Discard
+              Цуцлах
             </Button>
             <Button onClick={handleSave} disabled={isPending}>
-              Save
+              Хадгалах
             </Button>
           </DialogFooter>
         </DialogContent>

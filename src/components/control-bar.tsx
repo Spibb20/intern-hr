@@ -149,7 +149,7 @@ export function ControlBar({
         )}
 
         {views && views.length > 0 && (
-          <div className="flex items-center overflow-hidden rounded-lg border border-border bg-background/50">
+          <div className="flex items-center overflow-hidden rounded-md border border-border bg-background/50">
             {views.includes("kanban") && (
               <button
                 type="button"
@@ -157,7 +157,7 @@ export function ControlBar({
                 className={cn(
                   "p-2 text-muted-foreground transition-colors hover:bg-accent",
                   activeView === "kanban" &&
-                    "bg-accent text-brand-teal ring-1 ring-inset ring-brand-teal/50"
+                    "bg-accent text-brand-teal ring-1 ring-inset ring-brand-teal/50 rounded-md"
                 )}
                 aria-label="Kanban view"
               >
@@ -171,7 +171,7 @@ export function ControlBar({
                 className={cn(
                   "p-2 text-muted-foreground transition-colors hover:bg-accent",
                   activeView === "list" &&
-                    "bg-accent text-brand-teal ring-1 ring-inset ring-brand-teal/50"
+                    "bg-accent text-brand-teal ring-1 ring-inset ring-brand-teal/50 rounded-md"
                 )}
                 aria-label="List view"
               >
