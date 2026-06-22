@@ -11,7 +11,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     <div className="min-h-screen bg-background">
       <AppNavbar />
       <main className="flex-1 p-3 sm:p-5">
-        <div className="mx-auto w-full max-w-[1600px] overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm backdrop-blur">
+        <div className="mx-auto w-full max-w-[1800px] overflow-hidden rounded-md border border-border/70 bg-card shadow-sm backdrop-blur">
           {children}
         </div>
       </main>
