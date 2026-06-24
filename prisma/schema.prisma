@@ -172,7 +172,6 @@ model Employee {
   id     Int     @id @default(autoincrement())
   active Boolean @default(true)
 
-  // Монгол анкетад тохирсон нэрийн бүтэц
   lastName   String @default("") @map("last_name")
   firstName  String @map("first_name")
   familyName String @default("") @map("family_name")

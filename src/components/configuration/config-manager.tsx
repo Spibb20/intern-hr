@@ -331,7 +331,7 @@ export function ConfigManager({
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete this record?</AlertDialogTitle>
+            <AlertDialogTitle>Үүнийг устгах уу?</AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone. The record will be permanently
               removed.
@@ -346,7 +346,7 @@ export function ConfigManager({
               }}
               className="bg-destructive text-white hover:bg-destructive/90"
             >
-              Delete
+              Устгах
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
