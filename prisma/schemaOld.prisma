@@ -1,0 +1,491 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Gender {
+  male
+  female
+  other
+}
+
+enum MaritalStatus {
+  single
+  married
+  cohabitant
+  widower
+  divorced
+}
+
+enum LocationType {
+  office
+  home
+  other
+}
+
+enum KanbanState {
+  normal
+  done
+  blocked
+}
+
+enum AdministrativeUnitType {
+  country
+  province
+  capital
+  district
+  sum
+  khoroo
+  bag
+}
+
+enum LanguageLevel {
+  basic
+  intermediate
+  advanced
+  fluent
+  native
+}
+
+model Deps {
+  depId    Int     @id @default(autoincrement()) @map("DEP_ID") @db.SmallInt
+  name     String? @map("NAME") @db.Char(25)
+  parentId Int?    @map("PARENT_ID") @db.SmallInt
+
+  accNum          String? @map("ACC_NUM") @db.VarChar(50)
+  custIdent       Int?    @map("CUST_IDENT")
+  expTypeIdent    Int?    @map("EXPTYPE_IDENT")
+  socinsAcc       String? @map("SOCINS_ACC") @db.VarChar(50)
+  schedule        Int?    @map("SCHEDULE")
+  sclass          Int?    @map("SCLASS") @db.SmallInt
+  officeIdent     Int?    @map("OFFICE_IDENT")
+  listAcc         String? @map("LIST_ACC") @db.VarChar(50)
+  porder          Int?    @map("PORDER") @db.SmallInt
+  printColumns    String? @map("PRINT_COLUMNS") @db.VarChar(500)
+  printColumnsAdv String? @map("PRINT_COLUMNS_ADV") @db.VarChar(100)
+
+  parent   Deps?  @relation("DepsTree", fields: [parentId], references: [depId], onDelete: SetNull)
+  children Deps[] @relation("DepsTree")
+
+  employees    Employee[]
+  jobPositions JobPosition[]
+
+  @@index([parentId])
+  @@map("DEPS")
+}
+
+model Occupation {
+  occupationId        Int     @id @default(autoincrement()) @map("OCCUPATION_ID")
+  description         String  @map("DESCRIPTION") @db.Char(100)
+  fdbexpIdent         Int?    @map("FDBEXP_IDENT")
+  occup               Int?    @map("OCCUP") @db.SmallInt
+  occupationCharacter String? @map("OCCUPATION_CHARACTER") @db.VarChar(20)
+  schedId             Int?    @map("SCHED_ID")
+  oclassCode          String? @map("OCLASS_CODE") @db.VarChar(4)
+  oclassCode2024      String? @map("OCLASS_CODE2024") @db.VarChar(10)
+
+  employees    Employee[]
+  jobPositions JobPosition[]
+
+  @@map("OCCUPATION")
+}
+
+model Education {
+  educationId Int    @id @default(autoincrement()) @map("EDUCATION_ID")
+  description String @map("DESCRIPTION") @db.Char(25)
+
+  employees          Employee[]
+  employeeEducations EmployeeEducation[]
+
+  @@map("EDUCATION")
+}
+
+model JobPosition {
+  id           Int    @id @default(autoincrement())
+  name         String
+  depId        Int?   @map("dep_id") @db.SmallInt
+  occupationId Int?   @map("occupation_id")
+
+  department Deps?       @relation(fields: [depId], references: [depId], onDelete: SetNull)
+  occupation Occupation? @relation(fields: [occupationId], references: [occupationId], onDelete: SetNull)
+  employees  Employee[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([depId])
+  @@index([occupationId])
+  @@map("job_positions")
+}
+
+model EmployeeType {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  employees Employee[]
+
+  @@map("employee_types")
+}
+
+model WorkLocation {
+  id           Int          @id @default(autoincrement())
+  name         String
+  address      String       @default("")
+  locationType LocationType @default(office) @map("location_type")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  employees Employee[]
+
+  @@map("work_locations")
+}
+
+model Tag {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  color     String   @default("#7c3aed")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  employees EmployeeTag[]
+
+  @@map("tags")
+}
+
+model DepartureReason {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  employees Employee[]
+
+  @@map("departure_reasons")
+}
+
+model Employee {
+  id     Int     @id @default(autoincrement())
+  active Boolean @default(true)
+
+  lastName   String @default("") @map("last_name")
+  firstName  String @map("first_name")
+  familyName String @default("") @map("family_name")
+
+  registerNumber String         @default("") @map("register_number")
+  gender         Gender?
+  dateOfBirth    DateTime?      @map("date_of_birth") @db.Date
+  maritalStatus  MaritalStatus? @map("marital_status")
+
+  workEmail    String  @default("") @map("work_email")
+  workPhone    String  @default("") @map("work_phone")
+  workMobile   String  @default("") @map("work_mobile")
+  privateEmail String  @default("") @map("private_email")
+  privatePhone String  @default("") @map("private_phone")
+  avatarUrl    String? @map("avatar_url")
+
+  depId        Int? @map("dep_id") @db.SmallInt
+  occupationId Int? @map("occupation_id")
+  educationId  Int? @map("education_id")
+
+  jobPositionId  Int? @map("job_position_id")
+  managerId      Int? @map("manager_id")
+  employeeTypeId Int? @map("employee_type_id")
+  workLocationId Int? @map("work_location_id")
+
+  countryId      Int?   @map("country_id")
+  birthPlaceId   Int?   @map("birth_place_id")
+  addressUnitId  Int?   @map("address_unit_id")
+  privateAddress String @default("") @map("private_address")
+
+  academicDegreeId Int? @map("academic_degree_id")
+  rankLevelId      Int? @map("rank_level_id")
+
+  bankId      Int?   @map("bank_id")
+  bankAccount String @default("") @map("bank_account")
+
+  monthlyHours Int         @default(0) @map("monthly_hours")
+  kanbanState  KanbanState @default(normal) @map("kanban_state")
+
+  hiredAt           DateTime? @map("hired_at") @db.Date
+  dismissedAt       DateTime? @map("dismissed_at") @db.Date
+  departureReasonId Int?      @map("departure_reason_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  department  Deps?        @relation(fields: [depId], references: [depId], onDelete: SetNull)
+  occupation  Occupation?  @relation(fields: [occupationId], references: [occupationId], onDelete: SetNull)
+  education   Education?   @relation(fields: [educationId], references: [educationId], onDelete: SetNull)
+  jobPosition JobPosition? @relation(fields: [jobPositionId], references: [id], onDelete: SetNull)
+
+  manager Employee?  @relation("EmployeeManager", fields: [managerId], references: [id], onDelete: SetNull)
+  reports Employee[] @relation("EmployeeManager")
+
+  employeeType EmployeeType? @relation(fields: [employeeTypeId], references: [id], onDelete: SetNull)
+  workLocation WorkLocation? @relation(fields: [workLocationId], references: [id], onDelete: SetNull)
+
+  country     Country?            @relation(fields: [countryId], references: [id], onDelete: SetNull)
+  birthPlace  AdministrativeUnit? @relation("EmployeeBirthPlace", fields: [birthPlaceId], references: [id], onDelete: SetNull)
+  addressUnit AdministrativeUnit? @relation("EmployeeAddressUnit", fields: [addressUnitId], references: [id], onDelete: SetNull)
+
+  academicDegree AcademicDegree? @relation(fields: [academicDegreeId], references: [id], onDelete: SetNull)
+  rankLevel      RankLevel?      @relation(fields: [rankLevelId], references: [id], onDelete: SetNull)
+
+  bank            Bank?            @relation(fields: [bankId], references: [id], onDelete: SetNull)
+  departureReason DepartureReason? @relation(fields: [departureReasonId], references: [id], onDelete: SetNull)
+
+  tags               EmployeeTag[]
+  languages          EmployeeLanguage[]
+  trainings          EmployeeTraining[]
+  drivingCategories  EmployeeDrivingCategory[]
+  employeeEducations EmployeeEducation[]
+
+  @@index([active])
+  @@index([depId])
+  @@index([occupationId])
+  @@index([educationId])
+  @@index([jobPositionId])
+  @@index([managerId])
+  @@index([employeeTypeId])
+  @@index([workLocationId])
+  @@index([countryId])
+  @@index([birthPlaceId])
+  @@index([addressUnitId])
+  @@index([academicDegreeId])
+  @@index([rankLevelId])
+  @@index([bankId])
+  @@index([departureReasonId])
+  @@index([registerNumber])
+  @@map("employees")
+}
+
+model EmployeeTag {
+  employeeId Int @map("employee_id")
+  tagId      Int @map("tag_id")
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  tag      Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([employeeId, tagId])
+  @@index([tagId])
+  @@map("employee_tags")
+}
+
+model Country {
+  id     Int    @id @default(autoincrement())
+  nameMn String @map("name_mn")
+  nameEn String @default("") @map("name_en")
+  iso2   String @unique
+  iso3   String @default("")
+
+  employees Employee[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("countries")
+}
+
+model AdministrativeUnit {
+  id       Int                    @id @default(autoincrement())
+  name     String
+  code     String                 @default("")
+  unitType AdministrativeUnitType @map("unit_type")
+  parentId Int?                   @map("parent_id")
+
+  parent   AdministrativeUnit?  @relation("AdministrativeUnitTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children AdministrativeUnit[] @relation("AdministrativeUnitTree")
+
+  birthEmployees   Employee[] @relation("EmployeeBirthPlace")
+  addressEmployees Employee[] @relation("EmployeeAddressUnit")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([name, parentId])
+  @@index([parentId])
+  @@index([unitType])
+  @@map("administrative_units")
+}
+
+model RankLevel {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  employees Employee[]
+
+  @@map("rank_levels")
+}
+
+model AcademicDegree {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  employees          Employee[]
+  employeeEducations EmployeeEducation[]
+
+  @@map("academic_degrees")
+}
+
+model Language {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  code      String   @default("")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  employees EmployeeLanguage[]
+
+  @@map("languages")
+}
+
+model EmployeeLanguage {
+  employeeId Int            @map("employee_id")
+  languageId Int            @map("language_id")
+  level      LanguageLevel?
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  language Language @relation(fields: [languageId], references: [id], onDelete: Cascade)
+
+  @@id([employeeId, languageId])
+  @@index([languageId])
+  @@map("employee_languages")
+}
+
+model Training {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  employees EmployeeTraining[]
+
+  @@map("trainings")
+}
+
+model EmployeeTraining {
+  employeeId    Int       @map("employee_id")
+  trainingId    Int       @map("training_id")
+  startedAt     DateTime? @map("started_at") @db.Date
+  endedAt       DateTime? @map("ended_at") @db.Date
+  certificateNo String    @default("") @map("certificate_no")
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  training Training @relation(fields: [trainingId], references: [id], onDelete: Cascade)
+
+  @@id([employeeId, trainingId])
+  @@index([trainingId])
+  @@map("employee_trainings")
+}
+
+model SpecialtyType {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  professions Profession[]
+
+  @@map("specialty_types")
+}
+
+model Profession {
+  id              Int      @id @default(autoincrement())
+  name            String   @unique
+  specialtyTypeId Int?     @map("specialty_type_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  specialtyType      SpecialtyType?      @relation(fields: [specialtyTypeId], references: [id], onDelete: SetNull)
+  specializations    Specialization[]
+  employeeEducations EmployeeEducation[]
+
+  @@index([specialtyTypeId])
+  @@map("professions")
+}
+
+model Specialization {
+  id           Int      @id @default(autoincrement())
+  name         String   @unique
+  professionId Int?     @map("profession_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  profession         Profession?         @relation(fields: [professionId], references: [id], onDelete: SetNull)
+  employeeEducations EmployeeEducation[]
+
+  @@index([professionId])
+  @@map("specializations")
+}
+
+model EmployeeEducation {
+  id Int @id @default(autoincrement())
+
+  employeeId       Int    @map("employee_id")
+  schoolName       String @map("school_name")
+  educationId      Int?   @map("education_id")
+  academicDegreeId Int?   @map("academic_degree_id")
+  professionId     Int?   @map("profession_id")
+  specializationId Int?   @map("specialization_id")
+
+  startedAt   DateTime? @map("started_at") @db.Date
+  graduatedAt DateTime? @map("graduated_at") @db.Date
+  diplomaNo   String    @default("") @map("diploma_no")
+
+  employee       Employee        @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  education      Education?      @relation(fields: [educationId], references: [educationId], onDelete: SetNull)
+  academicDegree AcademicDegree? @relation(fields: [academicDegreeId], references: [id], onDelete: SetNull)
+  profession     Profession?     @relation(fields: [professionId], references: [id], onDelete: SetNull)
+  specialization Specialization? @relation(fields: [specializationId], references: [id], onDelete: SetNull)
+
+  @@index([employeeId])
+  @@index([educationId])
+  @@index([academicDegreeId])
+  @@index([professionId])
+  @@index([specializationId])
+  @@map("employee_educations")
+}
+
+model Bank {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  code      String   @default("")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  employees Employee[]
+
+  @@map("banks")
+}
+
+model DrivingCategory {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  employees EmployeeDrivingCategory[]
+
+  @@map("driving_categories")
+}
+
+model EmployeeDrivingCategory {
+  employeeId Int @map("employee_id")
+  categoryId Int @map("category_id")
+
+  employee Employee        @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  category DrivingCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([employeeId, categoryId])
+  @@index([categoryId])
+  @@map("employee_driving_categories")
+}
