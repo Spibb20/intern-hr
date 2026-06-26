@@ -6,769 +6,732 @@ datasource db {
   provider = "postgresql"
 }
 
-model Employee {
-  employeeId         Int       @id @default(autoincrement()) @map("employee_id")
-  name               String    @map("name") @db.Char(25)
-  surname            String?   @map("surname") @db.Char(25)
-  depIdent           Int?      @map("dep_ident") @db.SmallInt
-  post               String?   @map("post") @db.Char(25)
-  birthday           DateTime? @map("birthday")
-  emdno              String?   @map("emdno") @db.Char(14)
-  ndno               String?   @map("ndno") @db.Char(14)
-  workingYear        Int       @default(0) @map("working_year") @db.SmallInt
-  wskillIdent        Int?      @map("wskill_ident")
-  salary             Decimal   @default(0) @map("salary") @db.Decimal(18, 15)
-  inworkdate         DateTime? @map("inworkdate")
-  gDate              DateTime? @map("g_date")
-  gEnddate           DateTime? @map("g_enddate")
-  homephone          String?   @map("homephone") @db.Char(14)
-  workphone          String?   @map("workphone") @db.Char(14)
-  fullname           String?   @map("fullname") @db.VarChar(208)
-  calctype           Int?      @map("calctype") @db.SmallInt
-  workcondtn         Int?      @map("workcondtn") @db.SmallInt
-  status             String?   @default("active") @map("status") @db.Char(8)
-  managerExp         String?   @default("no") @map("manager_exp") @db.VarChar(12)
-  occupationIdent    Int?      @map("occupation_ident")
-  grade              String?   @map("grade") @db.Char(1)
-  gender             String?   @map("gender") @db.Char(1)
-  educationIdent     Int?      @map("education_ident")
-  graduateIdent      Int?      @map("graduate_ident")
-  ecode              String?   @map("ecode") @db.Char(20)
-  isSoldier          String?   @map("is_soldier") @db.Char(3)
-  loginpass          String?   @map("loginpass") @db.VarChar(20)
-  bycard             Int?      @map("bycard") @db.SmallInt
-  email              String?   @map("email") @db.VarChar(50)
-  bankIdent          Int?      @map("bank_ident")
-  branchIdent        Int?      @map("branch_ident")
-  schedule           Int?      @map("schedule")
-  registerno         String?   @map("registerno") @db.VarChar(20)
-  tenderer           Int?      @map("tenderer") @db.SmallInt
-  tenDays            Int?      @map("ten_days") @db.SmallInt
-  assetOwner         Int?      @default(1) @map("asset_owner") @db.SmallInt
-  itemOwner          Int?      @default(1) @map("item_owner") @db.SmallInt
-  registeredDate     DateTime? @map("registered_date")
-  ovog               String?   @map("ovog") @db.Char(25)
-  jobType            String?   @map("job_type") @db.VarChar(20)
-  jobFigure          String?   @default("Main") @map("job_figure") @db.VarChar(20)
-  maritalstatusIdent Int?      @map("maritalstatus_ident")
-  apartcondIdent     Int?      @map("apartcond_ident")
-  carowncondIdent    Int?      @map("carowncond_ident")
-  contractNum        String?   @map("contract_num") @db.Char(10)
-  nationalityIdent   Int?      @map("nationality_ident")
-  niigmiinGaralIdent Int?      @map("niigmiin_garal_ident")
-  countryIdent       Int?      @map("country_ident")
-  votingWorkIdent    Int?      @map("voting_work_ident")
-  degreeIdent        Int?      @map("degree_ident")
-  passport           String?   @map("passport") @db.VarChar(14)
-  clothessizeIdent   Int?      @map("clothessize_ident")
-  shoessizeIdent     Int?      @map("shoessize_ident")
-  income             Int?      @map("income")
-  contractEmp        String    @default("no") @map("contract_emp") @db.VarChar(12)
-  branchyear         Int?      @map("branchyear")
-  birthyear          Int?      @map("birthyear")
-  died               String    @default("no") @map("died") @db.VarChar(12)
-  hr                 String    @default("no") @map("hr") @db.VarChar(12)
-  realtor            Int?      @map("realtor") @db.SmallInt
-  insurIdent         Int?      @map("insur_ident")
-  limited            Int?      @map("limited") @db.SmallInt
-  locCode            String?   @map("loc_code") @db.VarChar(4)
-  ibankNumber        String?   @map("ibank_number") @db.VarChar(20)
-  bloodType          String?   @map("blood_type") @db.Char(2)
-  emptype            Int?      @map("emptype") @db.SmallInt
-  changedDate        DateTime? @map("changed_date")
-  commandIdent       Int?      @map("command_ident")
-  moveType           Int?      @map("move_type") @db.SmallInt
-  workyearSector     Int       @default(0) @map("workyear_sector") @db.SmallInt
-  firedreasonIdent   Int?      @map("firedreason_ident")
-  takenLeave         Int?      @map("taken_leave") @db.SmallInt
-  leaveType          Int?      @map("leave_type") @db.SmallInt
-  testMonth          Int?      @map("test_month") @db.SmallInt
-  foreignEmp         Int?      @map("foreign_emp") @db.SmallInt
-  wagetestEmp        Int?      @map("wagetest_emp") @db.SmallInt
-  officeIdent        Int?      @map("office_ident")
-  sectionIdent       Int?      @map("section_ident")
-  empno              String?   @map("empno") @db.VarChar(10)
-  gradePerc          Decimal   @default(0) @map("grade_perc") @db.Decimal(18, 15)
-  perc1              Decimal   @default(0) @map("perc1") @db.Decimal(18, 15)
-  perc2              Decimal   @default(0) @map("perc2") @db.Decimal(18, 15)
-  phone2             String?   @map("phone2") @db.VarChar(14)
-  gradeAmount        Decimal   @default(0) @map("grade_amount") @db.Decimal(18, 15)
-  gradeStart         DateTime? @map("grade_start")
-  gradeEnd           DateTime? @map("grade_end")
-  gradeLevel         String?   @map("grade_level") @db.VarChar(10)
-  occupationIdent2   Int?      @map("occupation_ident2")
-  salPercent         Decimal   @default(0) @map("sal_percent") @db.Decimal(18, 15)
-  salAmount          Decimal   @default(0) @map("sal_amount") @db.Decimal(18, 15)
-  wtype              Int?      @map("wtype") @db.SmallInt
-  disabledEmp        Int?      @map("disabled_emp") @db.SmallInt
-  photoUrl           String?   @map("photo_url") @db.VarChar(300)
-  posRelated         Boolean?  @map("pos_related")
-  etaxCode           String?   @map("etax_code") @db.VarChar(30)
-  urgiinOvog         String?   @map("urgiin_ovog") @db.VarChar(100)
-  commandNo          String?   @map("command_no") @db.VarChar(10)
-  commandDescription String?   @map("command_description") @db.VarChar(100)
-  authUsercompanyId  Int?      @map("auth_usercompany_id")
-  timetryId          String?   @map("timetry_id") @db.VarChar(25)
-  useTimetry         Int?      @map("use_timetry") @db.SmallInt
-  authUserId         Int?      @map("auth_user_id")
+model employee {
+  employee_id          Int       @id @default(autoincrement())
+  name                 String    @db.Char(25)
+  surname              String?   @db.Char(25)
+  dep_ident            Int?      @db.SmallInt
+  post                 String?   @db.Char(25)
+  birthday             DateTime?
+  emdno                String?   @db.Char(14)
+  ndno                 String?   @db.Char(14)
+  working_year         Int       @default(0) @db.SmallInt
+  wskill_ident         Int?
+  salary               Decimal   @default(0) @db.Decimal(18, 15)
+  inworkdate           DateTime?
+  g_date               DateTime?
+  g_enddate            DateTime?
+  homephone            String?   @db.Char(14)
+  workphone            String?   @db.Char(14)
+  fullname             String?   @db.VarChar(208)
+  calctype             Int?      @db.SmallInt
+  workcondtn           Int?      @db.SmallInt
+  status               String?   @default("active") @db.Char(8)
+  manager_exp          String?   @default("no") @db.VarChar(12)
+  occupation_ident     Int?
+  grade                String?   @db.Char(1)
+  gender               String?   @db.Char(1)
+  education_ident      Int?
+  graduate_ident       Int?
+  ecode                String?   @db.Char(20)
+  is_soldier           String?   @db.Char(3)
+  loginpass            String?   @db.VarChar(20)
+  bycard               Int?      @db.SmallInt
+  email                String?   @db.VarChar(50)
+  bank_ident           Int?
+  branch_ident         Int?
+  schedule             Int?
+  registerno           String?   @db.VarChar(20)
+  tenderer             Int?      @db.SmallInt
+  ten_days             Int?      @db.SmallInt
+  asset_owner          Int?      @default(1) @db.SmallInt
+  item_owner           Int?      @default(1) @db.SmallInt
+  registered_date      DateTime?
+  ovog                 String?   @db.Char(25)
+  job_type             String?   @db.VarChar(20)
+  job_figure           String?   @default("Main") @db.VarChar(20)
+  maritalstatus_ident  Int?
+  apartcond_ident      Int?
+  carowncond_ident     Int?
+  contract_num         String?   @db.Char(10)
+  nationality_ident    Int?
+  niigmiin_garal_ident Int?
+  country_ident        Int?
+  voting_work_ident    Int?
+  degree_ident         Int?
+  passport             String?   @db.VarChar(14)
+  clothessize_ident    Int?
+  shoessize_ident      Int?
+  income               Int?
+  contract_emp         String    @default("no") @db.VarChar(12)
+  branchyear           Int?
+  birthyear            Int?
+  died                 String    @default("no") @db.VarChar(12)
+  hr                   String    @default("no") @db.VarChar(12)
+  realtor              Int?      @db.SmallInt
+  insur_ident          Int?
+  limited              Int?      @db.SmallInt
+  loc_code             String?   @db.VarChar(4)
+  ibank_number         String?   @db.VarChar(20)
+  blood_type           String?   @db.Char(2)
+  emptype              Int?      @db.SmallInt
+  changed_date         DateTime?
+  command_ident        Int?
+  move_type            Int?      @db.SmallInt
+  workyear_sector      Int       @default(0) @db.SmallInt
+  firedreason_ident    Int?
+  taken_leave          Int?      @db.SmallInt
+  leave_type           Int?      @db.SmallInt
+  test_month           Int?      @db.SmallInt
+  foreign_emp          Int?      @db.SmallInt
+  wagetest_emp         Int?      @db.SmallInt
+  office_ident         Int?
+  section_ident        Int?
+  empno                String?   @db.VarChar(10)
+  grade_perc           Decimal   @default(0) @db.Decimal(18, 15)
+  perc1                Decimal   @default(0) @db.Decimal(18, 15)
+  perc2                Decimal   @default(0) @db.Decimal(18, 15)
+  phone2               String?   @db.VarChar(14)
+  grade_amount         Decimal   @default(0) @db.Decimal(18, 15)
+  grade_start          DateTime?
+  grade_end            DateTime?
+  grade_level          String?   @db.VarChar(10)
+  occupation_ident2    Int?
+  sal_percent          Decimal   @default(0) @db.Decimal(18, 15)
+  sal_amount           Decimal   @default(0) @db.Decimal(18, 15)
+  wtype                Int?      @db.SmallInt
+  disabled_emp         Int?      @db.SmallInt
+  photo_url            String?   @db.VarChar(300)
+  pos_related          Boolean?
+  etax_code            String?   @db.VarChar(30)
+  urgiin_ovog          String?   @db.VarChar(100)
+  command_no           String?   @db.VarChar(10)
+  command_description  String?   @db.VarChar(100)
+  auth_usercompany_id  Int?
+  timetry_id           String?   @db.VarChar(25)
+  use_timetry          Int?      @db.SmallInt
+  auth_user_id         Int?
 
-  dep           Deps?            @relation(fields: [depIdent], references: [depId], onDelete: SetNull)
-  workSkill     WorkSkill?       @relation(fields: [wskillIdent], references: [wskillId], onDelete: SetNull)
-  occupation    Occupation?      @relation("EmployeeOccupation", fields: [occupationIdent], references: [occupationId], onDelete: SetNull)
-  occupation2   Occupation?      @relation("EmployeeOccupation2", fields: [occupationIdent2], references: [occupationId], onDelete: SetNull)
-  education     Education?       @relation(fields: [educationIdent], references: [educationId], onDelete: SetNull)
-  graduate      Graduate?        @relation(fields: [graduateIdent], references: [graduateId], onDelete: SetNull)
-  bank          Banks?           @relation(fields: [bankIdent], references: [bankId], onDelete: SetNull)
-  branch        Branch?          @relation(fields: [branchIdent], references: [branchId], onDelete: SetNull)
-  shift         Shifts?          @relation(fields: [schedule], references: [id], onDelete: SetNull)
-  maritalStatus MaritalStatus?   @relation(fields: [maritalstatusIdent], references: [maritalstatusId], onDelete: SetNull)
-  apartmentCond ApartmentCond?   @relation(fields: [apartcondIdent], references: [apartcondId], onDelete: SetNull)
-  carownCond    CarownCond?      @relation(fields: [carowncondIdent], references: [carowncondId], onDelete: SetNull)
-  nationality   Nationality?     @relation(fields: [nationalityIdent], references: [nationalityId], onDelete: SetNull)
-  niigmiinGaral NiigmiinGaral?   @relation(fields: [niigmiinGaralIdent], references: [niigmiinGaralId], onDelete: SetNull)
-  country       Country?         @relation(fields: [countryIdent], references: [countryIdent], onDelete: SetNull)
-  votingWork    VotingWork?      @relation(fields: [votingWorkIdent], references: [votingWorkId], onDelete: SetNull)
-  clothesSize   ClothesSizeType? @relation("EmployeeClothesSize", fields: [clothessizeIdent], references: [typeid], onDelete: SetNull)
-  shoesSize     ClothesSizeType? @relation("EmployeeShoesSize", fields: [shoessizeIdent], references: [typeid], onDelete: SetNull)
-  insurType     InsurType?       @relation(fields: [insurIdent], references: [insurId], onDelete: SetNull)
-  firedReason   FiredReason?     @relation(fields: [firedreasonIdent], references: [firedreasonId], onDelete: SetNull)
-  office        HrOffice?        @relation(fields: [officeIdent], references: [officeId], onDelete: SetNull)
+  dep            deps?              @relation(fields: [dep_ident], references: [dep_id], onDelete: SetNull)
+  work_skill     work_skill?        @relation(fields: [wskill_ident], references: [wskill_id], onDelete: SetNull)
+  occupation     occupation?        @relation("EmployeeOccupation", fields: [occupation_ident], references: [occupation_id], onDelete: SetNull)
+  occupation2    occupation?        @relation("EmployeeOccupation2", fields: [occupation_ident2], references: [occupation_id], onDelete: SetNull)
+  education      education?         @relation(fields: [education_ident], references: [education_id], onDelete: SetNull)
+  graduate       graduate?          @relation(fields: [graduate_ident], references: [graduate_id], onDelete: SetNull)
+  bank           banks?             @relation(fields: [bank_ident], references: [bank_id], onDelete: SetNull)
+  branch         branch?            @relation(fields: [branch_ident], references: [branch_id], onDelete: SetNull)
+  shift          shifts?            @relation(fields: [schedule], references: [id], onDelete: SetNull)
+  marital_status marital_status?    @relation(fields: [maritalstatus_ident], references: [maritalstatus_id], onDelete: SetNull)
+  apartment_cond apartment_cond?    @relation(fields: [apartcond_ident], references: [apartcond_id], onDelete: SetNull)
+  carown_cond    carown_cond?       @relation(fields: [carowncond_ident], references: [carowncond_id], onDelete: SetNull)
+  nationality    nationality?       @relation(fields: [nationality_ident], references: [nationality_id], onDelete: SetNull)
+  niigmiin_garal niigmiin_garal?    @relation(fields: [niigmiin_garal_ident], references: [niigmiin_garal_id], onDelete: SetNull)
+  country        country?           @relation(fields: [country_ident], references: [country_ident], onDelete: SetNull)
+  voting_work    voting_work?       @relation(fields: [voting_work_ident], references: [voting_work_id], onDelete: SetNull)
+  degree         degree?            @relation(fields: [degree_ident], references: [degree_id], onDelete: SetNull)
+  clothes_size   clothes_size_type? @relation("EmployeeClothesSize", fields: [clothessize_ident], references: [typeid], onDelete: SetNull)
+  shoes_size     clothes_size_type? @relation("EmployeeShoesSize", fields: [shoessize_ident], references: [typeid], onDelete: SetNull)
+  insur_type     insur_type?        @relation(fields: [insur_ident], references: [insur_id], onDelete: SetNull)
+  fired_reason   fired_reason?      @relation(fields: [firedreason_ident], references: [firedreason_id], onDelete: SetNull)
+  office         hr_office?         @relation(fields: [office_ident], references: [office_id], onDelete: SetNull)
 
-  foreignLanguages  ForeignLang[]
-  hrTrainings       HrTraining[]
-  empPhotos         EmpPhoto[]
-  employeeHistories EmployeeHistory[]
-  drivers           Driver[]
-  educs             Educ[]
-  specEdus          SpecEdu[]
-  empGrades         EmpGrade[]
-  empVacations      EmpVacation[]
-  hrAbsents         HrAbsents[]
-  commands          Command[]
-  empAssets         EmpAssets[]
-  empTalents        EmpTalents[]
+  foreign_languages  foreign_lang[]
+  hr_trainings       hr_training[]
+  emp_photos         emp_photo[]
+  employee_histories employee_history[]
+  drivers            driver[]
+  educs              educ[]
+  spec_edus          spec_edu[]
+  emp_grades         emp_grade[]
+  emp_vacations      emp_vacation[]
+  hr_absents         hr_absents[]
+  commands           command[]
+  emp_assets         emp_assets[]
+  emp_talents        emp_talents[]
 
-  @@index([depIdent])
-  @@index([occupationIdent])
-  @@index([occupationIdent2])
-  @@index([educationIdent])
-  @@index([graduateIdent])
-  @@index([bankIdent])
-  @@index([branchIdent])
-  @@index([countryIdent])
-  @@index([nationalityIdent])
-  @@index([maritalstatusIdent])
-  @@index([officeIdent])
+  @@index([dep_ident])
+  @@index([occupation_ident])
+  @@index([occupation_ident2])
+  @@index([education_ident])
+  @@index([graduate_ident])
+  @@index([bank_ident])
+  @@index([branch_ident])
+  @@index([country_ident])
+  @@index([nationality_ident])
+  @@index([degree_ident])
+  @@index([niigmiin_garal_ident])
+  @@index([voting_work_ident])
+  @@index([clothessize_ident])
+  @@index([shoessize_ident])
+  @@index([apartcond_ident])
+  @@index([carowncond_ident])
+  @@index([wskill_ident])
+  @@index([schedule])
+  @@index([firedreason_ident])
+  @@index([insur_ident])
+  @@index([maritalstatus_ident])
+  @@index([office_ident])
   @@index([registerno])
   @@index([status])
-  @@map("employee")
 }
 
-model Deps {
-  depId           Int     @id @default(autoincrement()) @map("dep_id") @db.SmallInt
-  name            String? @map("name") @db.Char(25)
-  parentId        Int?    @map("parent_id") @db.SmallInt
-  accNum          String? @map("acc_num") @db.Char(12)
-  custIdent       Int?    @map("cust_ident")
-  exptypeIdent    Int?    @map("exptype_ident")
-  socinsAcc       String? @map("socins_acc") @db.Char(12)
-  schedule        Int?    @map("schedule")
-  sclass          Int?    @map("sclass") @db.SmallInt
-  officeIdent     Int?    @map("office_ident")
-  listAcc         String? @map("list_acc") @db.Char(12)
-  porder          Int?    @map("porder") @db.SmallInt
-  printColumns    String? @map("print_columns") @db.VarChar(500)
-  printColumnsAdv String? @map("print_columns_adv") @db.VarChar(500)
+model deps {
+  dep_id            Int     @id @default(autoincrement()) @db.SmallInt
+  name              String? @db.Char(25)
+  parent_id         Int?    @db.SmallInt
+  acc_num           String? @db.Char(12)
+  cust_ident        Int?
+  exptype_ident     Int?
+  socins_acc        String? @db.Char(12)
+  schedule          Int?
+  sclass            Int?    @db.SmallInt
+  office_ident      Int?
+  list_acc          String? @db.Char(12)
+  porder            Int?    @db.SmallInt
+  print_columns     String? @db.VarChar(500)
+  print_columns_adv String? @db.VarChar(500)
 
-  parent    Deps?      @relation("DepsTree", fields: [parentId], references: [depId], onDelete: SetNull)
-  children  Deps[]     @relation("DepsTree")
-  shift     Shifts?    @relation(fields: [schedule], references: [id], onDelete: SetNull)
-  office    HrOffice?  @relation(fields: [officeIdent], references: [officeId], onDelete: SetNull)
-  employees Employee[]
+  parent    deps?      @relation("DepsTree", fields: [parent_id], references: [dep_id], onDelete: SetNull)
+  children  deps[]     @relation("DepsTree")
+  shift     shifts?    @relation(fields: [schedule], references: [id], onDelete: SetNull)
+  office    hr_office? @relation(fields: [office_ident], references: [office_id], onDelete: SetNull)
+  employees employee[]
 
-  @@index([parentId])
+  @@index([parent_id])
   @@index([schedule])
-  @@index([officeIdent])
-  @@map("deps")
+  @@index([office_ident])
 }
 
-model Occupation {
-  occupationId        Int     @id @default(autoincrement()) @map("occupation_id")
-  description         String  @map("description") @db.Char(100)
-  fdbexpIdent         Int?    @map("fdbexp_ident")
-  occup               Int?    @map("occup") @db.SmallInt
-  occupationCharacter String? @map("occupation_character") @db.VarChar(20)
-  schedId             Int?    @map("sched_id")
-  oclassCode          String? @map("oclass_code") @db.VarChar(4)
-  oclassCode2024      String? @map("oclass_code2024") @db.VarChar(10)
+model occupation {
+  occupation_id        Int     @id @default(autoincrement())
+  description          String  @db.Char(100)
+  fdbexp_ident         Int?
+  occup                Int?    @db.SmallInt
+  occupation_character String? @db.VarChar(20)
+  sched_id             Int?
+  oclass_code          String? @db.VarChar(4)
+  oclass_code2024      String? @db.VarChar(10)
 
-  schedule   Schedule?  @relation(fields: [schedId], references: [schedId], onDelete: SetNull)
-  employees  Employee[] @relation("EmployeeOccupation")
-  employees2 Employee[] @relation("EmployeeOccupation2")
+  schedule   schedule?  @relation(fields: [sched_id], references: [sched_id], onDelete: SetNull)
+  employees  employee[] @relation("EmployeeOccupation")
+  employees2 employee[] @relation("EmployeeOccupation2")
 
-  @@index([schedId])
-  @@map("occupation")
+  @@index([sched_id])
 }
 
-model Education {
-  educationId Int    @id @default(autoincrement()) @map("education_id")
-  description String @map("description") @db.Char(25)
+model education {
+  education_id Int    @id @default(autoincrement())
+  description  String @db.Char(25)
 
-  employees Employee[]
-
-  @@map("education")
+  employees employee[]
 }
 
-model Banks {
-  bankId       Int       @id @default(autoincrement()) @map("bank_id")
-  description  String?   @map("description") @db.VarChar(100)
-  email        String?   @map("email") @db.VarChar(50)
-  phone        String?   @map("phone") @db.VarChar(15)
-  recacc       String?   @map("recacc") @db.Char(12)
-  reccustIdent Int?      @map("reccust_ident")
-  bankCode     String?   @map("bank_code") @db.VarChar(20)
-  address      String?   @map("address") @db.VarChar(70)
-  countryIdent Int?      @map("country_ident")
-  modifiedDate DateTime? @map("modified_date")
-  bicCode      String?   @map("bic_code") @db.VarChar(20)
-  banknumber   String?   @map("banknumber") @db.VarChar(20)
-  codeSalary   String?   @map("code_salary") @db.VarChar(20)
+model banks {
+  bank_id       Int       @id @default(autoincrement())
+  description   String?   @db.VarChar(100)
+  email         String?   @db.VarChar(50)
+  phone         String?   @db.VarChar(15)
+  recacc        String?   @db.Char(12)
+  reccust_ident Int?
+  bank_code     String?   @db.VarChar(20)
+  address       String?   @db.VarChar(70)
+  country_ident Int?
+  modified_date DateTime?
+  bic_code      String?   @db.VarChar(20)
+  banknumber    String?   @db.VarChar(20)
+  code_salary   String?   @db.VarChar(20)
 
-  country   Country?   @relation(fields: [countryIdent], references: [countryIdent], onDelete: SetNull)
-  employees Employee[]
+  country   country?   @relation(fields: [country_ident], references: [country_ident], onDelete: SetNull)
+  employees employee[]
 
-  @@index([countryIdent])
-  @@map("banks")
+  @@index([country_ident])
 }
 
-model Country {
-  countryIdent Int     @id @default(autoincrement()) @map("country_ident")
-  description  String  @map("description") @db.VarChar(50)
-  countryCode  String? @map("country_code") @db.VarChar(10)
-  code4bank    String? @map("code4bank") @db.VarChar(5)
+model country {
+  country_ident Int     @id @default(autoincrement())
+  description   String  @db.VarChar(50)
+  country_code  String? @db.VarChar(10)
+  code4bank     String? @db.VarChar(5)
 
-  employees Employee[]
-  banks     Banks[]
-
-  @@map("country")
+  employees employee[]
+  banks     banks[]
 }
 
-model Nationality {
-  nationalityId Int    @id @default(autoincrement()) @map("nationality_id")
-  description   String @map("description") @db.Char(50)
+model nationality {
+  nationality_id Int    @id @default(autoincrement())
+  description    String @db.Char(50)
 
-  employees Employee[]
-
-  @@map("nationality")
+  employees employee[]
 }
 
-model Citytown {
-  cityId      Int     @id @default(autoincrement()) @map("city_id")
-  description String  @map("description") @db.VarChar(50)
-  regionCode  String? @map("region_code") @db.VarChar(10)
+model citytown {
+  city_id     Int     @id @default(autoincrement())
+  description String  @db.VarChar(50)
+  region_code String? @db.VarChar(10)
 
-  districts District[]
-
-  @@map("citytown")
+  districts district[]
 }
 
-model District {
-  districtId  Int     @id @default(autoincrement()) @map("district_id")
-  description String  @map("description") @db.VarChar(50)
-  code        Int?    @map("code")
-  locCode     Int?    @map("loc_code")
-  cityIdent   Int     @map("city_ident")
-  regionCode  String? @map("region_code") @db.VarChar(10)
+model district {
+  district_id Int     @id @default(autoincrement())
+  description String  @db.VarChar(50)
+  code        Int?
+  loc_code    Int?
+  city_ident  Int
+  region_code String? @db.VarChar(10)
 
-  city Citytown @relation(fields: [cityIdent], references: [cityId])
+  city citytown @relation(fields: [city_ident], references: [city_id])
 
-  @@index([cityIdent])
-  @@map("district")
+  @@index([city_ident])
 }
 
-model MaritalStatus {
-  maritalstatusId Int     @id @default(autoincrement()) @map("maritalstatus_id")
-  description     String? @map("description") @db.Char(30)
-  rplLocal        String? @default("N") @map("rpl_local") @db.Char(1)
+model marital_status {
+  maritalstatus_id Int     @id @default(autoincrement())
+  description      String? @db.Char(30)
+  rpl_local        String? @default("N") @db.Char(1)
 
-  employees Employee[]
-
-  @@map("marital_status")
+  employees employee[]
 }
 
-model ApartmentCond {
-  apartcondId Int     @id @default(autoincrement()) @map("apartcond_id")
-  description String  @map("description") @db.VarChar(50)
-  rplLocal    String? @default("N") @map("rpl_local") @db.Char(1)
+model apartment_cond {
+  apartcond_id Int     @id @default(autoincrement())
+  description  String  @db.VarChar(50)
+  rpl_local    String? @default("N") @db.Char(1)
 
-  employees Employee[]
-
-  @@map("apartment_cond")
+  employees employee[]
 }
 
-model CarownCond {
-  carowncondId Int     @id @default(autoincrement()) @map("carowncond_id")
-  description  String  @map("description") @db.VarChar(50)
-  rplLocal     String? @default("N") @map("rpl_local") @db.Char(1)
+model carown_cond {
+  carowncond_id Int     @id @default(autoincrement())
+  description   String  @db.VarChar(50)
+  rpl_local     String? @default("N") @db.Char(1)
 
-  employees Employee[]
-
-  @@map("carown_cond")
+  employees employee[]
 }
 
-model NiigmiinGaral {
-  niigmiinGaralId Int     @id @default(autoincrement()) @map("niigmiin_garal_id")
-  description     String  @map("description") @db.VarChar(50)
-  rplLocal        String? @default("N") @map("rpl_local") @db.Char(1)
+model niigmiin_garal {
+  niigmiin_garal_id Int     @id @default(autoincrement())
+  description       String  @db.VarChar(50)
+  rpl_local         String? @default("N") @db.Char(1)
 
-  employees Employee[]
-
-  @@map("niigmiin_garal")
+  employees employee[]
 }
 
-model VotingWork {
-  votingWorkId Int    @id @default(autoincrement()) @map("voting_work_id")
-  description  String @map("description") @db.VarChar(50)
+model voting_work {
+  voting_work_id Int    @id @default(autoincrement())
+  description    String @db.VarChar(50)
 
-  employees Employee[]
-
-  @@map("voting_work")
+  employees employee[]
 }
 
-model Graduate {
-  graduateId  Int    @id @default(autoincrement()) @map("graduate_id")
-  description String @map("description") @db.Char(25)
+model graduate {
+  graduate_id Int    @id @default(autoincrement())
+  description String @db.Char(25)
 
-  employees Employee[]
-
-  @@map("graduate")
+  employees employee[]
 }
 
-model InsurType {
-  insurId      Int      @id @default(autoincrement()) @map("insur_id")
-  insurCode    String?  @map("insur_code") @db.VarChar(10)
-  description  String?  @map("description") @db.VarChar(100)
-  salType      Int?     @map("sal_type") @db.SmallInt
-  insOrder     Int?     @map("ins_order")
-  colnum       Int?     @map("colnum") @db.SmallInt
-  ndshPercent  Decimal? @map("ndsh_percent") @db.Decimal(18, 2)
-  empPercent   Decimal? @map("emp_percent") @db.Decimal(18, 2)
-  insurCodenew String?  @map("insur_codenew") @db.VarChar(10)
+model insur_type {
+  insur_id      Int      @id @default(autoincrement())
+  insur_code    String?  @db.VarChar(10)
+  description   String?  @db.VarChar(100)
+  sal_type      Int?     @db.SmallInt
+  ins_order     Int?
+  colnum        Int?     @db.SmallInt
+  ndsh_percent  Decimal? @db.Decimal(18, 2)
+  emp_percent   Decimal? @db.Decimal(18, 2)
+  insur_codenew String?  @db.VarChar(10)
 
-  employees Employee[]
-
-  @@map("insur_type")
+  employees employee[]
 }
 
-model FiredReason {
-  firedreasonId Int    @id @default(autoincrement()) @map("firedreason_id")
-  description   String @map("description") @db.VarChar(100)
+model fired_reason {
+  firedreason_id Int    @id @default(autoincrement())
+  description    String @db.VarChar(100)
 
-  employees Employee[]
-
-  @@map("fired_reason")
+  employees employee[]
 }
 
-model ClothesSizeType {
-  typeid         Int     @id @default(autoincrement()) @map("typeid")
-  clothessize    String  @map("clothessize") @db.Char(10)
-  sizetype       String  @map("sizetype") @db.Char(7)
-  sizeOtherMan   String? @map("size_other_man") @db.Char(10)
-  sizeOtherWoman String? @map("size_other_woman") @db.Char(10)
+model clothes_size_type {
+  typeid           Int     @id @default(autoincrement())
+  clothessize      String  @db.Char(10)
+  sizetype         String  @db.Char(7)
+  size_other_man   String? @db.Char(10)
+  size_other_woman String? @db.Char(10)
 
-  clothesEmployees Employee[] @relation("EmployeeClothesSize")
-  shoesEmployees   Employee[] @relation("EmployeeShoesSize")
-
-  @@map("clothes_size_type")
+  clothes_employees employee[] @relation("EmployeeClothesSize")
+  shoes_employees   employee[] @relation("EmployeeShoesSize")
 }
 
-model WorkSkill {
-  wskillId    Int     @id @default(autoincrement()) @map("wskill_id")
-  description String  @map("description") @db.Char(25)
-  costNormal  Decimal @default(0) @map("cost_normal") @db.Decimal(18, 15)
-  costHard    Decimal @default(0) @map("cost_hard") @db.Decimal(18, 15)
-  costOther   Decimal @default(0) @map("cost_other") @db.Decimal(18, 15)
+model work_skill {
+  wskill_id   Int     @id @default(autoincrement())
+  description String  @db.Char(25)
+  cost_normal Decimal @default(0) @db.Decimal(18, 15)
+  cost_hard   Decimal @default(0) @db.Decimal(18, 15)
+  cost_other  Decimal @default(0) @db.Decimal(18, 15)
 
-  employees Employee[]
-
-  @@map("work_skill")
+  employees employee[]
 }
 
-model Branch {
-  branchId        Int       @id @default(autoincrement()) @map("branch_id")
-  description     String    @map("description") @db.Char(25)
-  boss            String?   @map("boss") @db.Char(30)
-  genAccountant   String?   @map("gen_accountant") @db.Char(30)
-  status          Int       @map("status") @db.SmallInt
-  legalName       String?   @map("legal_name") @db.Char(40)
-  address         String?   @map("address") @db.Char(90)
-  registerno      String?   @map("registerno") @db.Char(20)
-  ttd             String?   @map("ttd") @db.Char(20)
-  orgType         String?   @map("org_type") @db.Char(25)
-  accountant      String?   @map("accountant") @db.Char(25)
-  custid          Int?      @map("custid")
-  manager         Int?      @map("manager")
-  bankname        String?   @map("bankname") @db.VarChar(30)
-  banknumber      String?   @map("banknumber") @db.VarChar(20)
-  phone           String?   @map("phone") @db.VarChar(60)
-  hrmanager       String?   @map("hrmanager") @db.VarChar(30)
-  tradeunionName  String?   @map("tradeunion_name") @db.VarChar(100)
-  tradeunionAssoc String?   @map("tradeunion_assoc") @db.VarChar(100)
-  tradeunionHead  String?   @map("tradeunion_head") @db.VarChar(100)
-  chkdate         DateTime? @map("chkdate")
-  logo            Bytes?    @map("logo")
-  isSync          String?   @map("is_sync") @db.VarChar(3)
-  modifiedDate    DateTime? @map("modified_date")
-  bossSign1       Bytes?    @map("boss_sign1")
-  accountSign1    Bytes?    @map("account_sign1")
-  stampAcc        Bytes?    @map("stamp_acc")
-  stampBoss       Bytes?    @map("stamp_boss")
-  emdCust         Int?      @map("emd_cust")
-  emdacc          String?   @map("emdacc") @db.Char(12)
-  taxable         String?   @map("taxable") @db.VarChar(12)
-  email           String?   @map("email") @db.VarChar(100)
+model branch {
+  branch_id        Int       @id @default(autoincrement())
+  description      String    @db.Char(25)
+  boss             String?   @db.Char(30)
+  gen_accountant   String?   @db.Char(30)
+  status           Int       @db.SmallInt
+  legal_name       String?   @db.Char(40)
+  address          String?   @db.Char(90)
+  registerno       String?   @db.Char(20)
+  ttd              String?   @db.Char(20)
+  org_type         String?   @db.Char(25)
+  accountant       String?   @db.Char(25)
+  custid           Int?
+  manager          Int?
+  bankname         String?   @db.VarChar(30)
+  banknumber       String?   @db.VarChar(20)
+  phone            String?   @db.VarChar(60)
+  hrmanager        String?   @db.VarChar(30)
+  tradeunion_name  String?   @db.VarChar(100)
+  tradeunion_assoc String?   @db.VarChar(100)
+  tradeunion_head  String?   @db.VarChar(100)
+  chkdate          DateTime?
+  logo             Bytes?
+  is_sync          String?   @db.VarChar(3)
+  modified_date    DateTime?
+  boss_sign1       Bytes?
+  account_sign1    Bytes?
+  stamp_acc        Bytes?
+  stamp_boss       Bytes?
+  emd_cust         Int?
+  emdacc           String?   @db.Char(12)
+  taxable          String?   @db.VarChar(12)
+  email            String?   @db.VarChar(100)
 
-  employees Employee[]
-
-  @@map("branch")
+  employees employee[]
 }
 
-model HrOffice {
-  officeId Int    @id @default(autoincrement()) @map("office_id")
-  name     String @map("name") @db.VarChar(100)
+model hr_office {
+  office_id Int    @id @default(autoincrement())
+  name      String @db.VarChar(100)
 
-  deps      Deps[]
-  employees Employee[]
-
-  @@map("hr_office")
+  deps      deps[]
+  employees employee[]
 }
 
-model Shifts {
-  id   Int    @id @default(autoincrement()) @map("id")
-  name String @map("name") @db.VarChar(20)
+model shifts {
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(20)
 
-  deps      Deps[]
-  employees Employee[]
-
-  @@map("shifts")
+  deps      deps[]
+  employees employee[]
 }
 
-model Schedule {
-  schedId   Int    @id @default(autoincrement()) @map("sched_id")
-  schedName String @map("sched_name") @db.VarChar(30)
-  workDay   Int    @map("work_day")
-  holiday   Int    @map("holiday")
+model schedule {
+  sched_id   Int    @id @default(autoincrement())
+  sched_name String @db.VarChar(30)
+  work_day   Int
+  holiday    Int
 
-  occupations Occupation[]
-
-  @@map("schedule")
+  occupations occupation[]
 }
 
-model ProfessionType {
-  professiontypeId Int    @id @default(autoincrement()) @map("professiontype_id")
-  description      String @map("description") @db.Char(100)
-
-  @@map("profession_type")
+model profession_type {
+  professiontype_id Int    @id @default(autoincrement())
+  description       String @db.Char(100)
 }
 
-model EduType {
-  educationId Int     @id @default(autoincrement()) @map("education_id")
-  name        String  @map("name") @db.VarChar(50)
-  rplLocal    String? @default("N") @map("rpl_local") @db.Char(1)
+model edu_type {
+  education_id Int     @id @default(autoincrement())
+  name         String  @db.VarChar(50)
+  rpl_local    String? @default("N") @db.Char(1)
 
-  educs Educ[]
-
-  @@map("edu_type")
+  educs educ[]
 }
 
-model Educ {
-  educId        Int       @id @default(autoincrement()) @map("educ_id") @db.SmallInt
-  employeeIdent Int       @map("employee_ident")
-  eduIdent      Int       @map("edu_ident")
-  startdate     DateTime? @map("startdate")
-  startYear     Int       @map("start_year") @db.SmallInt
+model educ {
+  educ_id        Int       @id @default(autoincrement()) @db.SmallInt
+  employee_ident Int
+  edu_ident      Int
+  startdate      DateTime?
+  start_year     Int       @db.SmallInt
 
-  employee Employee @relation(fields: [employeeIdent], references: [employeeId], onDelete: Cascade)
-  eduType  EduType  @relation(fields: [eduIdent], references: [educationId])
+  employee employee @relation(fields: [employee_ident], references: [employee_id], onDelete: Cascade)
+  edu_type edu_type @relation(fields: [edu_ident], references: [education_id])
 
-  @@index([employeeIdent])
-  @@index([eduIdent])
-  @@map("educ")
+  @@index([employee_ident])
+  @@index([edu_ident])
 }
 
-model SpecEduType {
-  specEduTypeId Int    @id @default(autoincrement()) @map("spec_edu_type_id")
-  description   String @map("description") @db.Char(30)
+model spec_edu_type {
+  spec_edu_type_id Int    @id @default(autoincrement())
+  description      String @db.Char(30)
 
-  specEdus SpecEdu[]
-
-  @@map("spec_edu_type")
+  spec_edus spec_edu[]
 }
 
-model SpecEdu {
-  specEduId        Int       @id @default(autoincrement()) @map("spec_edu_id")
-  employeeIdent    Int       @map("employee_ident")
-  specEduTypeIdent Int       @map("spec_edu_type_ident")
-  orgEdu           String    @map("org_edu") @db.VarChar(30)
-  certifyNumber    String?   @map("certify_number") @db.Char(20)
-  certifyDate      DateTime? @map("certify_date")
-  profession       String?   @map("profession") @db.VarChar(20)
-  endDate          DateTime? @map("end_date")
-  specProfession   String?   @map("spec_profession") @db.VarChar(20)
-  certifyYear      Int       @map("certify_year") @db.SmallInt
+model spec_edu {
+  spec_edu_id         Int       @id @default(autoincrement())
+  employee_ident      Int
+  spec_edu_type_ident Int
+  org_edu             String    @db.VarChar(30)
+  certify_number      String?   @db.Char(20)
+  certify_date        DateTime?
+  profession          String?   @db.VarChar(20)
+  end_date            DateTime?
+  spec_profession     String?   @db.VarChar(20)
+  certify_year        Int       @db.SmallInt
 
-  employee    Employee    @relation(fields: [employeeIdent], references: [employeeId], onDelete: Cascade)
-  specEduType SpecEduType @relation(fields: [specEduTypeIdent], references: [specEduTypeId])
+  employee      employee      @relation(fields: [employee_ident], references: [employee_id], onDelete: Cascade)
+  spec_edu_type spec_edu_type @relation(fields: [spec_edu_type_ident], references: [spec_edu_type_id])
 
-  @@index([employeeIdent])
-  @@index([specEduTypeIdent])
-  @@map("spec_edu")
+  @@index([employee_ident])
+  @@index([spec_edu_type_ident])
 }
 
-model Flanguages {
-  flanguageId Int     @id @default(autoincrement()) @map("flanguage_id")
-  description String  @map("description") @db.Char(30)
-  rplLocal    String? @default("N") @map("rpl_local") @db.Char(1)
+model flanguages {
+  flanguage_id Int     @id @default(autoincrement())
+  description  String  @db.Char(30)
+  rpl_local    String? @default("N") @db.Char(1)
 
-  foreignLangs ForeignLang[]
-
-  @@map("flanguages")
+  foreign_langs foreign_lang[]
 }
 
-model LangLevel {
-  langlevelId Int    @id @default(autoincrement()) @map("langlevel_id")
-  levelName   String @map("level_name") @db.VarChar(50)
-
-  @@map("lang_level")
+model lang_level {
+  langlevel_id Int    @id @default(autoincrement())
+  level_name   String @db.VarChar(50)
 }
 
-model ForeignLang {
-  foreignlangId  Int     @id @default(autoincrement()) @map("foreignlang_id")
-  employeeIdent  Int     @map("employee_ident")
-  flanguageIdent Int     @map("flanguage_ident")
-  understandLvl  String? @map("understand_lvl") @db.Char(15)
-  speakingLvl    String? @map("speaking_lvl") @db.Char(15)
-  readingLvl     String? @map("reading_lvl") @db.Char(15)
-  writingLvl     String? @map("writing_lvl") @db.Char(15)
-  description    String? @map("description") @db.VarChar(50)
+model foreign_lang {
+  foreignlang_id  Int     @id @default(autoincrement())
+  employee_ident  Int
+  flanguage_ident Int
+  understand_lvl  String? @db.Char(15)
+  speaking_lvl    String? @db.Char(15)
+  reading_lvl     String? @db.Char(15)
+  writing_lvl     String? @db.Char(15)
+  description     String? @db.VarChar(50)
 
-  employee Employee   @relation(fields: [employeeIdent], references: [employeeId], onDelete: Cascade)
-  language Flanguages @relation(fields: [flanguageIdent], references: [flanguageId])
+  employee employee   @relation(fields: [employee_ident], references: [employee_id], onDelete: Cascade)
+  language flanguages @relation(fields: [flanguage_ident], references: [flanguage_id])
 
-  @@index([employeeIdent])
-  @@index([flanguageIdent])
-  @@map("foreign_lang")
+  @@index([employee_ident])
+  @@index([flanguage_ident])
 }
 
-model HrTraining {
-  trainingId     Int       @id @default(autoincrement()) @map("training_id")
-  empIdent       Int       @map("emp_ident")
-  trType         Int       @default(1) @map("tr_type") @db.SmallInt
-  description    String    @map("description") @db.VarChar(50)
-  startDate      DateTime? @map("start_date")
-  days           Int?      @map("days") @db.SmallInt
-  amount         Decimal   @default(0) @map("amount") @db.Decimal(18, 15)
-  payType        Int       @map("pay_type") @db.SmallInt
-  trainingCenter String?   @map("training_center") @db.VarChar(100)
-  startYear      Int       @map("start_year") @db.SmallInt
+model hr_training {
+  training_id     Int       @id @default(autoincrement())
+  emp_ident       Int
+  tr_type         Int       @default(1) @db.SmallInt
+  description     String    @db.VarChar(50)
+  start_date      DateTime?
+  days            Int?      @db.SmallInt
+  amount          Decimal   @default(0) @db.Decimal(18, 15)
+  pay_type        Int       @db.SmallInt
+  training_center String?   @db.VarChar(100)
+  start_year      Int       @db.SmallInt
 
-  employee Employee @relation(fields: [empIdent], references: [employeeId])
+  employee employee @relation(fields: [emp_ident], references: [employee_id])
 
-  @@index([empIdent])
-  @@map("hr_training")
+  @@index([emp_ident])
 }
 
-model EmpPhoto {
-  photoId Int    @id @default(autoincrement()) @map("photo_id")
-  empId   Int    @map("emp_id")
-  photo   Bytes? @map("photo")
+model emp_photo {
+  photo_id Int    @id @default(autoincrement())
+  emp_id   Int
+  photo    Bytes?
 
-  employee Employee @relation(fields: [empId], references: [employeeId])
+  employee employee @relation(fields: [emp_id], references: [employee_id])
 
-  @@index([empId])
-  @@map("emp_photo")
+  @@index([emp_id])
 }
 
-model EmployeeHistory {
-  historyId          Int       @id @default(autoincrement()) @map("history_id")
-  employeeIdent      Int       @map("employee_ident")
-  name               String    @map("name") @db.Char(25)
-  surname            String?   @map("surname") @db.Char(25)
-  post               String?   @map("post") @db.Char(25)
-  birthday           DateTime? @map("birthday")
-  emdno              String?   @map("emdno") @db.Char(14)
-  ndno               String?   @map("ndno") @db.Char(14)
-  workingYear        Int       @default(0) @map("working_year") @db.SmallInt
-  salary             Decimal   @default(0) @map("salary") @db.Decimal(18, 2)
-  inworkdate         DateTime? @map("inworkdate")
-  gDate              DateTime? @map("g_date")
-  gEnddate           DateTime? @map("g_enddate")
-  homephone          String?   @map("homephone") @db.Char(14)
-  workphone          String?   @map("workphone") @db.Char(14)
-  calctype           Int?      @map("calctype") @db.SmallInt
-  status             String?   @default("active") @map("status") @db.Char(8)
-  managerExp         String?   @default("no") @map("manager_exp") @db.VarChar(3)
-  occupationIdent    Int?      @map("occupation_ident")
-  gender             String?   @map("gender") @db.Char(1)
-  educationIdent     Int?      @map("education_ident")
-  graduateIdent      Int?      @map("graduate_ident")
-  ecode              String?   @map("ecode") @db.Char(20)
-  bycard             Int?      @map("bycard") @db.SmallInt
-  email              String?   @map("email") @db.VarChar(50)
-  register           String?   @map("register") @db.VarChar(20)
-  passport           String?   @map("passport") @db.VarChar(20)
-  inworknumber       String?   @map("inworknumber") @db.VarChar(10)
-  address            String?   @map("address") @db.VarChar(100)
-  ndshDeps           Int?      @map("ndsh_deps")
-  hoatDeps           Int?      @map("hoat_deps")
-  firedNumber        String?   @map("fired_number") @db.VarChar(10)
-  firedDate          DateTime? @map("fired_date")
-  firedIdent         Int?      @map("fired_ident")
-  depIdent           Int?      @map("dep_ident")
-  sIdent             Int?      @map("s_ident")
-  bonus              String?   @map("bonus") @db.VarChar(20)
-  workcondtn         Int?      @map("workcondtn") @db.SmallInt
-  countryIdent       Int?      @map("country_ident")
-  country1Ident      Int?      @map("country1_ident")
-  changedDate        DateTime? @map("changed_date")
-  comandNo           String?   @map("comand_no") @db.VarChar(10)
-  commandIdent       Int?      @map("command_ident")
-  contractEmp        String?   @default("no") @map("contract_emp") @db.VarChar(12)
-  branchIdent        Int?      @map("branch_ident")
-  moveType           Int?      @map("move_type") @db.SmallInt
-  firedreasonIdent   Int?      @map("firedreason_ident")
-  emptype            Int?      @map("emptype") @db.SmallInt
-  fullname           String?   @map("fullname") @db.VarChar(208)
-  isdefault          Int?      @map("isdefault") @db.SmallInt
-  foreignEmp         Int?      @map("foreign_emp") @db.SmallInt
-  wagetestEmp        Int?      @map("wagetest_emp") @db.SmallInt
-  commandDescription String?   @map("command_description") @db.VarChar(100)
-  insurIdent         Int?      @map("insur_ident")
+model employee_history {
+  history_id          Int       @id @default(autoincrement())
+  employee_ident      Int
+  name                String    @db.Char(25)
+  surname             String?   @db.Char(25)
+  post                String?   @db.Char(25)
+  birthday            DateTime?
+  emdno               String?   @db.Char(14)
+  ndno                String?   @db.Char(14)
+  working_year        Int       @default(0) @db.SmallInt
+  salary              Decimal   @default(0) @db.Decimal(18, 2)
+  inworkdate          DateTime?
+  g_date              DateTime?
+  g_enddate           DateTime?
+  homephone           String?   @db.Char(14)
+  workphone           String?   @db.Char(14)
+  calctype            Int?      @db.SmallInt
+  status              String?   @default("active") @db.Char(8)
+  manager_exp         String?   @default("no") @db.VarChar(3)
+  occupation_ident    Int?
+  gender              String?   @db.Char(1)
+  education_ident     Int?
+  graduate_ident      Int?
+  ecode               String?   @db.Char(20)
+  bycard              Int?      @db.SmallInt
+  email               String?   @db.VarChar(50)
+  register            String?   @db.VarChar(20)
+  passport            String?   @db.VarChar(20)
+  inworknumber        String?   @db.VarChar(10)
+  address             String?   @db.VarChar(100)
+  ndsh_deps           Int?
+  hoat_deps           Int?
+  fired_number        String?   @db.VarChar(10)
+  fired_date          DateTime?
+  fired_ident         Int?
+  dep_ident           Int?
+  s_ident             Int?
+  bonus               String?   @db.VarChar(20)
+  workcondtn          Int?      @db.SmallInt
+  country_ident       Int?
+  country1_ident      Int?
+  changed_date        DateTime?
+  comand_no           String?   @db.VarChar(10)
+  command_ident       Int?
+  contract_emp        String?   @default("no") @db.VarChar(12)
+  branch_ident        Int?
+  move_type           Int?      @db.SmallInt
+  firedreason_ident   Int?
+  emptype             Int?      @db.SmallInt
+  fullname            String?   @db.VarChar(208)
+  isdefault           Int?      @db.SmallInt
+  foreign_emp         Int?      @db.SmallInt
+  wagetest_emp        Int?      @db.SmallInt
+  command_description String?   @db.VarChar(100)
+  insur_ident         Int?
 
-  employee Employee @relation(fields: [employeeIdent], references: [employeeId])
+  employee employee @relation(fields: [employee_ident], references: [employee_id])
 
-  @@index([employeeIdent])
-  @@map("employee_history")
+  @@index([employee_ident])
 }
 
-model DriverType {
-  driverTypeId Int     @id @default(autoincrement()) @map("driver_type_id")
-  description  String  @map("description") @db.VarChar(30)
-  rplLocal     String? @default("N") @map("rpl_local") @db.Char(1)
+model driver_type {
+  driver_type_id Int     @id @default(autoincrement())
+  description    String  @db.VarChar(30)
+  rpl_local      String? @default("N") @db.Char(1)
 
-  drivers Driver[]
-
-  @@map("driver_type")
+  drivers driver[]
 }
 
-model Driver {
-  idDriver      Int       @id @default(autoincrement()) @map("id_driver")
-  employeeIdent Int       @map("employee_ident")
-  numberDriver  String?   @map("number_driver") @db.VarChar(15)
-  insertedOgnoo DateTime? @map("inserted_ognoo")
-  drivertype    Int       @map("drivertype")
+model driver {
+  id_driver      Int       @id @default(autoincrement())
+  employee_ident Int
+  number_driver  String?   @db.VarChar(15)
+  inserted_ognoo DateTime?
+  drivertype     Int
 
-  employee   Employee   @relation(fields: [employeeIdent], references: [employeeId], onDelete: Cascade)
-  driverType DriverType @relation(fields: [drivertype], references: [driverTypeId])
+  employee    employee    @relation(fields: [employee_ident], references: [employee_id], onDelete: Cascade)
+  driver_type driver_type @relation(fields: [drivertype], references: [driver_type_id])
 
-  @@index([employeeIdent])
+  @@index([employee_ident])
   @@index([drivertype])
-  @@map("driver")
 }
 
-model EmpGrade {
-  gradeId    Int       @id @default(autoincrement()) @map("grade_id")
-  empIdent   Int?      @map("emp_ident")
-  gradeLevel String?   @map("grade_level") @db.VarChar(100)
-  gradeStart DateTime? @map("grade_start")
-  gradeEnd   DateTime? @map("grade_end")
-  salAmount  Decimal   @default(0) @map("sal_amount") @db.Decimal(18, 15)
+model emp_grade {
+  grade_id    Int       @id @default(autoincrement())
+  emp_ident   Int?
+  grade_level String?   @db.VarChar(100)
+  grade_start DateTime?
+  grade_end   DateTime?
+  sal_amount  Decimal   @default(0) @db.Decimal(18, 15)
 
-  employee Employee? @relation(fields: [empIdent], references: [employeeId], onDelete: SetNull)
+  employee employee? @relation(fields: [emp_ident], references: [employee_id], onDelete: SetNull)
 
-  @@index([empIdent])
-  @@map("emp_grade")
+  @@index([emp_ident])
 }
 
-model EmpVacation {
-  empIdent   Int       @map("emp_ident")
-  xmonth     Int?      @default(0) @map("xmonth") @db.SmallInt
-  depIdent   Int?      @map("dep_ident")
-  myear      Int       @map("myear") @db.SmallInt
-  mmonth     Int       @map("mmonth") @db.SmallInt
-  isVacation String?   @default("no") @map("is_vacation") @db.VarChar(12)
-  vDay       Int       @default(0) @map("v_day") @db.SmallInt
-  startDate  DateTime? @map("start_date")
-  endDate    DateTime? @map("end_date")
+model emp_vacation {
+  emp_ident   Int
+  xmonth      Int?      @default(0) @db.SmallInt
+  dep_ident   Int?
+  myear       Int       @db.SmallInt
+  mmonth      Int       @db.SmallInt
+  is_vacation String?   @default("no") @db.VarChar(12)
+  v_day       Int       @default(0) @db.SmallInt
+  start_date  DateTime?
+  end_date    DateTime?
 
-  employee Employee @relation(fields: [empIdent], references: [employeeId], onDelete: Cascade)
+  employee employee @relation(fields: [emp_ident], references: [employee_id], onDelete: Cascade)
 
-  @@id([empIdent, myear, mmonth])
-  @@map("emp_vacation")
+  @@id([emp_ident, myear, mmonth])
 }
 
-model HrAbsents {
-  absentId   Int      @id @default(autoincrement()) @map("absent_id")
-  empIdent   Int      @map("emp_ident")
-  absentType Int      @map("absent_type") @db.SmallInt
-  days       Int?     @map("days") @db.SmallInt
-  times      Int?     @map("times") @db.SmallInt
-  minutes    Int?     @map("minutes") @db.SmallInt
-  timeStr    String?  @map("time_str") @db.VarChar(20)
-  adate      DateTime @map("adate")
+model hr_absents {
+  absent_id   Int      @id @default(autoincrement())
+  emp_ident   Int
+  absent_type Int      @db.SmallInt
+  days        Int?     @db.SmallInt
+  times       Int?     @db.SmallInt
+  minutes     Int?     @db.SmallInt
+  time_str    String?  @db.VarChar(20)
+  adate       DateTime
 
-  employee Employee @relation(fields: [empIdent], references: [employeeId], onDelete: Cascade)
+  employee employee @relation(fields: [emp_ident], references: [employee_id], onDelete: Cascade)
 
-  @@index([empIdent])
-  @@map("hr_absents")
+  @@index([emp_ident])
 }
 
-model Command {
-  commandId     Int       @id @default(autoincrement()) @map("command_id")
-  employeeIdent Int       @map("employee_ident")
-  command       String?   @map("command") @db.VarChar(50)
-  outdate       DateTime? @map("outdate")
-  humanCommand  String?   @map("human_command") @db.VarChar(25)
-  commandno     String    @map("commandno") @db.VarChar(10)
-  path          String?   @map("path") @db.VarChar(100)
-  rplLocal      String?   @default("N") @map("rpl_local") @db.Char(1)
-  commandType   Int?      @map("command_type") @db.SmallInt
+model command {
+  command_id     Int       @id @default(autoincrement())
+  employee_ident Int
+  command        String?   @db.VarChar(50)
+  outdate        DateTime?
+  human_command  String?   @db.VarChar(25)
+  commandno      String    @db.VarChar(10)
+  path           String?   @db.VarChar(100)
+  rpl_local      String?   @default("N") @db.Char(1)
+  command_type   Int?      @db.SmallInt
 
-  employee Employee @relation(fields: [employeeIdent], references: [employeeId], onDelete: Cascade)
+  employee employee @relation(fields: [employee_ident], references: [employee_id], onDelete: Cascade)
 
-  @@index([employeeIdent])
-  @@map("command")
+  @@index([employee_ident])
 }
 
-model EmpAssets {
-  empassetId      Int       @id @default(autoincrement()) @map("empasset_id")
-  empIdent        Int       @map("emp_ident")
-  assetIdent      Int       @map("asset_ident")
-  sdate           DateTime? @map("sdate")
-  inactiveDate    DateTime? @map("inactive_date")
-  quantity        Decimal   @default(0) @map("quantity") @db.Decimal(18, 15)
-  inactiv         Int?      @default(0) @map("inactiv") @db.SmallInt
-  assettransIdent Int?      @map("assettrans_ident")
-  barcode         String?   @map("barcode") @db.VarChar(30)
-  atype           Int?      @map("atype") @db.SmallInt
-  masterId        Int?      @map("master_id")
-  userName        String    @default("system") @map("user_name") @db.Char(20)
-  atrId           Int?      @map("atr_id")
+model emp_assets {
+  empasset_id      Int       @id @default(autoincrement())
+  emp_ident        Int
+  asset_ident      Int
+  sdate            DateTime?
+  inactive_date    DateTime?
+  quantity         Decimal   @default(0) @db.Decimal(18, 15)
+  inactiv          Int?      @default(0) @db.SmallInt
+  assettrans_ident Int?
+  barcode          String?   @db.VarChar(30)
+  atype            Int?      @db.SmallInt
+  master_id        Int?
+  user_name        String    @default("system") @db.Char(20)
+  atr_id           Int?
 
-  employee Employee @relation(fields: [empIdent], references: [employeeId])
+  employee employee @relation(fields: [emp_ident], references: [employee_id])
 
-  @@index([empIdent])
-  @@map("emp_assets")
+  @@index([emp_ident])
 }
 
-model EmpTalents {
-  empIdent    Int     @map("emp_ident")
-  talentIdent Int     @map("talent_ident")
-  trainedYear Int?    @map("trained_year") @db.SmallInt
-  description String? @map("description") @db.VarChar(200)
+model emp_talents {
+  emp_ident    Int
+  talent_ident Int
+  trained_year Int?    @db.SmallInt
+  description  String? @db.VarChar(200)
 
-  employee Employee @relation(fields: [empIdent], references: [employeeId])
+  employee employee @relation(fields: [emp_ident], references: [employee_id])
+  talent   talents  @relation(fields: [talent_ident], references: [talent_id], onDelete: Cascade)
 
-  @@id([empIdent, talentIdent])
-  @@map("emp_talents")
+  @@id([emp_ident, talent_ident])
+  @@index([talent_ident])
+}
+
+model degree {
+  degree_id   Int     @id @default(autoincrement())
+  description String  @db.VarChar(30)
+  rpl_local   String? @default("N") @db.Char(1)
+
+  employees employee[]
+}
+
+model talents {
+  talent_id   Int    @id @default(autoincrement())
+  description String @unique @db.Char(30)
+
+  emp_talents emp_talents[]
 }
