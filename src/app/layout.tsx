@@ -4,18 +4,16 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
-  title: "Odoo ERP Employee",
-  description: "Odoo-inspired employee management system",
+  title: "HR Employee",
+  description: "Employee management system",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning className="h-full antialiased">
-      <body className="flex min-h-full flex-col">
+    <html lang="mn" suppressHydrationWarning className="h-full antialiased">
+      <body className="min-h-full">
         <ThemeProvider>
           {children}
           <Toaster richColors position="top-right" />

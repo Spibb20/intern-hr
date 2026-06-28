@@ -6,13 +6,8 @@ import {
 } from "@/components/configuration/config-manager";
 import { CONFIG_DEFS } from "@/lib/config-defs";
 import { getConfigRows, getFormOptions } from "@/lib/data/queries";
-import type { ConfigModel } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
-
-function isConfigModel(value: string): value is ConfigModel {
-  return value in CONFIG_DEFS;
-}
 
 export default async function ConfigurationPage({
   params,
@@ -20,36 +15,35 @@ export default async function ConfigurationPage({
   params: Promise<{ model: string }>;
 }) {
   const { model } = await params;
-  if (!isConfigModel(model)) notFound();
-
   const def = CONFIG_DEFS[model];
+  if (!def) notFound();
+
   const [rows, options] = await Promise.all([
     getConfigRows(model),
     getFormOptions(),
   ]);
-
   const relatedLabels: Record<string, Record<string, string>> = {};
-  const fields: FieldDef[] = def.fields.map((f) => {
-    if (f.type === "select" && f.optionsKey) {
-      const opts = options[f.optionsKey] as { id: string; name: string }[];
-      relatedLabels[f.key] = Object.fromEntries(
-        opts.map((o) => [o.id, o.name])
+  const fields: FieldDef[] = def.fields.map((field) => {
+    if (field.type === "select" && field.optionsKey) {
+      const fieldOptions = options[field.optionsKey] ?? [];
+      relatedLabels[field.key] = Object.fromEntries(
+        fieldOptions.map((option) => [option.id, option.name])
       );
       return {
-        key: f.key,
-        label: f.label,
-        type: f.type,
-        required: f.required,
-        placeholder: f.placeholder,
-        options: opts,
+        key: field.key,
+        label: field.label,
+        type: field.type,
+        required: field.required,
+        placeholder: field.placeholder,
+        options: fieldOptions,
       };
     }
     return {
-      key: f.key,
-      label: f.label,
-      type: f.type,
-      required: f.required,
-      placeholder: f.placeholder,
+      key: field.key,
+      label: field.label,
+      type: field.type,
+      required: field.required,
+      placeholder: field.placeholder,
     };
   });
 

@@ -1,178 +1,172 @@
-import { PrismaClient } from "@prisma/client";
 import "dotenv/config";
+import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
-const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL!,
-});
-
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  await prisma.employeeTag.deleteMany();
-  await prisma.department.updateMany({ data: { managerId: null } });
-  await prisma.employee.deleteMany();
-  await prisma.departureReason.deleteMany();
-  await prisma.tag.deleteMany();
-  await prisma.workLocation.deleteMany();
-  await prisma.employeeType.deleteMany();
-  await prisma.jobPosition.deleteMany();
-  await prisma.department.deleteMany();
-
-  await prisma.department.createMany({
-    data: [
-      { id: "dep_admin", name: "Administration", color: "#22d3ee" },
-      { id: "dep_mgmt", name: "Management", color: "#d946a6" },
-      { id: "dep_rnd", name: "Research & Development", color: "#34d399" },
-    ],
+  await prisma.hr_office.createMany({
+    data: [{ office_id: 1, name: "Төв оффис" }],
+    skipDuplicates: true,
   });
-
-  await prisma.jobPosition.createMany({
+  await prisma.shifts.createMany({
+    data: [{ id: 1, name: "Үндсэн" }],
+    skipDuplicates: true,
+  });
+  await prisma.schedule.createMany({
+    data: [{ sched_id: 1, sched_name: "5 өдөр", work_day: 5, holiday: 2 }],
+    skipDuplicates: true,
+  });
+  await prisma.deps.createMany({
     data: [
-      { id: "job_consultant", name: "Consultant", departmentId: "dep_rnd" },
+      { dep_id: 1, name: "Administration", schedule: 1, office_ident: 1 },
+      { dep_id: 2, name: "Management", schedule: 1, office_ident: 1 },
       {
-        id: "job_ceo",
-        name: "Chief Executive Officer",
-        departmentId: "dep_mgmt",
+        dep_id: 3,
+        name: "Research",
+        parent_id: 2,
+        schedule: 1,
+        office_ident: 1,
       },
-      { id: "job_dev", name: "Experienced Developer", departmentId: "dep_rnd" },
-      { id: "job_sales", name: "Sales Manager", departmentId: "dep_admin" },
     ],
+    skipDuplicates: true,
   });
-
-  await prisma.employeeType.createMany({
+  await prisma.occupation.createMany({
     data: [
-      { id: "et_employee", name: "Employee" },
-      { id: "et_consultant", name: "Consultant" },
-      { id: "et_contractor", name: "Contractor" },
-      { id: "et_intern", name: "Intern" },
+      { occupation_id: 1, description: "Chief Executive Officer", sched_id: 1 },
+      { occupation_id: 2, description: "HR Manager", sched_id: 1 },
+      { occupation_id: 3, description: "Developer", sched_id: 1 },
+      { occupation_id: 4, description: "Accountant", sched_id: 1 },
     ],
+    skipDuplicates: true,
   });
-
-  await prisma.workLocation.createMany({
+  await prisma.education.createMany({
+    data: [
+      { education_id: 1, description: "Bachelor" },
+      { education_id: 2, description: "Master" },
+      { education_id: 3, description: "Doctor" },
+    ],
+    skipDuplicates: true,
+  });
+  await prisma.graduate.createMany({
+    data: [
+      { graduate_id: 1, description: "MUIS" },
+      { graduate_id: 2, description: "ШУТИС" },
+    ],
+    skipDuplicates: true,
+  });
+  await prisma.country.createMany({
+    data: [{ country_ident: 1, description: "Mongolia", country_code: "MN" }],
+    skipDuplicates: true,
+  });
+  await prisma.nationality.createMany({
+    data: [{ nationality_id: 1, description: "Монгол" }],
+    skipDuplicates: true,
+  });
+  await prisma.marital_status.createMany({
+    data: [
+      { maritalstatus_id: 1, description: "Single" },
+      { maritalstatus_id: 2, description: "Married" },
+    ],
+    skipDuplicates: true,
+  });
+  await prisma.work_skill.createMany({
     data: [
       {
-        id: "wl_office",
-        name: "Main Office",
-        address: "250 Executive Park Blvd",
-        locationType: "office",
+        wskill_id: 1,
+        description: "Ерөнхий",
+        cost_normal: 0,
+        cost_hard: 0,
+        cost_other: 0,
       },
-      { id: "wl_home", name: "Home", locationType: "home" },
     ],
+    skipDuplicates: true,
   });
-
-  await prisma.tag.createMany({
+  await prisma.branch.createMany({
     data: [
-      { id: "tag_consultant", name: "Consultant", color: "#0d9488" },
-      { id: "tag_employee", name: "Employee", color: "#b45309" },
-      { id: "tag_demo", name: "Demo", color: "#7c3aed" },
+      {
+        branch_id: 1,
+        description: "Main branch",
+        status: 1,
+        legal_name: "My Company",
+      },
     ],
+    skipDuplicates: true,
   });
-
-  await prisma.departureReason.createMany({
+  await prisma.banks.createMany({
+    data: [{ bank_id: 1, description: "Khan Bank", country_ident: 1 }],
+    skipDuplicates: true,
+  });
+  await prisma.employee.createMany({
     data: [
-      { id: "dr_fired", name: "Fired" },
-      { id: "dr_resigned", name: "Resigned" },
-      { id: "dr_retired", name: "Retired" },
+      {
+        employee_id: 1,
+        name: "Michael",
+        surname: "Williams",
+        fullname: "Williams Michael",
+        dep_ident: 2,
+        post: "CEO",
+        occupation_ident: 1,
+        education_ident: 2,
+        email: "michael@example.com",
+        workphone: "70000001",
+        status: "active",
+        branch_ident: 1,
+        bank_ident: 1,
+        schedule: 1,
+        office_ident: 1,
+        salary: 0,
+        working_year: 5,
+        workyear_sector: 5,
+      },
+      {
+        employee_id: 2,
+        name: "Emma",
+        surname: "Granger",
+        fullname: "Granger Emma",
+        dep_ident: 3,
+        post: "HR Manager",
+        occupation_ident: 2,
+        education_ident: 1,
+        email: "emma@example.com",
+        workphone: "70000002",
+        status: "active",
+        branch_ident: 1,
+        bank_ident: 1,
+        schedule: 1,
+        office_ident: 1,
+        salary: 0,
+        working_year: 2,
+        workyear_sector: 2,
+      },
+      {
+        employee_id: 3,
+        name: "Simon",
+        surname: "Jones",
+        fullname: "Jones Simon",
+        dep_ident: 3,
+        post: "Developer",
+        occupation_ident: 3,
+        education_ident: 1,
+        email: "simon@example.com",
+        workphone: "70000003",
+        status: "active",
+        branch_ident: 1,
+        bank_ident: 1,
+        schedule: 1,
+        office_ident: 1,
+        salary: 0,
+        working_year: 1,
+        workyear_sector: 1,
+      },
     ],
-  });
-
-  const employees = [
-    {
-      id: "emp_emma",
-      name: "Emma Granger",
-      workEmail: "granger@mycompany.example.com",
-      workPhone: "(555)-768-6230",
-      workMobile: "(555)-768-6231",
-      avatarUrl: "/employees/emma.png",
-      jobPositionId: "job_consultant",
-      jobTitle: "Consultant",
-      departmentId: "dep_rnd",
-      employeeTypeId: "et_consultant",
-      workLocationId: "wl_office",
-      company: "My Company",
-      gender: "female",
-      monthlyHours: 160,
-      kanbanState: "normal",
-    },
-    {
-      id: "emp_michael",
-      name: "Michael Williams",
-      workEmail: "williams@mycompany.example.com",
-      workPhone: "(555)-768-6230",
-      workMobile: "(555)-768-6232",
-      avatarUrl: "/employees/michael.png",
-      jobPositionId: "job_ceo",
-      jobTitle: "Chief Executive Officer",
-      departmentId: "dep_mgmt",
-      employeeTypeId: "et_employee",
-      workLocationId: "wl_office",
-      company: "My Company",
-      gender: "male",
-      maritalStatus: "married",
-      monthlyHours: 160,
-      kanbanState: "done",
-    },
-    {
-      id: "emp_simon",
-      name: "Simon Jones",
-      workEmail: "jones@mycompany.example.com",
-      workPhone: "(555)-768-6230",
-      workMobile: "(555)-768-6233",
-      avatarUrl: "/employees/simon.png",
-      jobPositionId: "job_dev",
-      jobTitle: "Experienced Developer",
-      departmentId: "dep_rnd",
-      managerId: "emp_michael",
-      employeeTypeId: "et_employee",
-      workLocationId: "wl_office",
-      company: "My Company",
-      gender: "male",
-      maritalStatus: "single",
-      monthlyHours: 160,
-      kanbanState: "normal",
-    },
-    {
-      id: "emp_admin1",
-      name: "Olivia Brown",
-      workEmail: "brown@mycompany.example.com",
-      workPhone: "(555)-768-6240",
-      jobPositionId: "job_sales",
-      jobTitle: "Sales Manager",
-      departmentId: "dep_admin",
-      employeeTypeId: "et_employee",
-      workLocationId: "wl_office",
-      company: "My Company",
-      gender: "female",
-      monthlyHours: 160,
-      kanbanState: "normal",
-    },
-  ] as const;
-
-  for (const employee of employees) {
-    await prisma.employee.create({ data: employee });
-  }
-
-  await prisma.department.update({
-    where: { id: "dep_mgmt" },
-    data: { managerId: "emp_michael" },
-  });
-
-  await prisma.employeeTag.createMany({
-    data: [
-      { employeeId: "emp_emma", tagId: "tag_consultant" },
-      { employeeId: "emp_emma", tagId: "tag_demo" },
-      { employeeId: "emp_michael", tagId: "tag_employee" },
-      { employeeId: "emp_michael", tagId: "tag_demo" },
-      { employeeId: "emp_simon", tagId: "tag_employee" },
-      { employeeId: "emp_simon", tagId: "tag_demo" },
-      { employeeId: "emp_admin1", tagId: "tag_employee" },
-    ],
+    skipDuplicates: true,
   });
 }
 
 main()
-  .finally(async () => prisma.$disconnect())
+  .then(async () => prisma.$disconnect())
   .catch(async (error) => {
     console.error(error);
     await prisma.$disconnect();

@@ -5,5 +5,5 @@ export const dynamic = "force-dynamic";
 
 export default async function NewDepartmentPage() {
   const options = await getFormOptions();
-  return <DepartmentForm managers={options.managers} />;
+  return <DepartmentForm options={options} />;
 }

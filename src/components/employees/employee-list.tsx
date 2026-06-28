@@ -14,49 +14,58 @@ export function EmployeeList({
 }: {
   employees: EmployeeWithRelations[];
 }) {
-  if (employees.length === 0) {
+  if (employees.length === 0)
     return (
-      <div className="py-24 text-center text-sm text-muted-foreground">
-        No employees found.
+      <div className="py-20 text-center text-sm text-muted-foreground">
+        Ажилтан олдсонгүй.
       </div>
     );
-  }
 
   return (
     <div className="p-4">
-      <div className="overflow-hidden rounded-xl border border-border bg-background/45 shadow-sm">
+      <div className="overflow-hidden rounded-md border bg-card">
         <Table>
           <TableHeader>
-            <TableRow className="bg-control-bar/90 hover:bg-control-bar">
-              <TableHead>Name</TableHead>
-              <TableHead>Job Position</TableHead>
-              <TableHead className="hidden md:table-cell">Work Email</TableHead>
-              <TableHead className="hidden lg:table-cell">Work Phone</TableHead>
-              <TableHead>Department</TableHead>
+            <TableRow>
+              <TableHead>Код</TableHead>
+              <TableHead>Нэр</TableHead>
+              <TableHead>Албан тушаал</TableHead>
+              <TableHead className="hidden md:table-cell">Имэйл</TableHead>
+              <TableHead className="hidden lg:table-cell">Утас</TableHead>
+              <TableHead>Хэлтэс</TableHead>
+              <TableHead>Төлөв</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {employees.map((employee) => (
-              <TableRow key={employee.id} className="cursor-pointer">
+              <TableRow key={employee.id}>
+                <TableCell className="text-muted-foreground">
+                  {employee.empno || employee.employeeId}
+                </TableCell>
                 <TableCell className="font-medium">
                   <Link
                     href={`/employees/${employee.id}`}
-                    className="hover:text-brand-teal"
+                    className="hover:underline"
                   >
                     {employee.name}
                   </Link>
                 </TableCell>
                 <TableCell className="text-muted-foreground">
-                  {employee.jobPosition?.name || employee.jobTitle || "—"}
+                  {employee.jobPosition?.name || employee.post || "—"}
                 </TableCell>
                 <TableCell className="hidden text-muted-foreground md:table-cell">
-                  {employee.workEmail || "—"}
+                  {employee.email || "—"}
                 </TableCell>
                 <TableCell className="hidden text-muted-foreground lg:table-cell">
-                  {employee.workPhone || "—"}
+                  {employee.workphone || employee.phone2 || "—"}
                 </TableCell>
                 <TableCell className="text-muted-foreground">
                   {employee.department?.name ?? "—"}
+                </TableCell>
+                <TableCell>
+                  <span className="rounded-md border px-2 py-1 text-xs text-muted-foreground">
+                    {employee.status || "active"}
+                  </span>
                 </TableCell>
               </TableRow>
             ))}

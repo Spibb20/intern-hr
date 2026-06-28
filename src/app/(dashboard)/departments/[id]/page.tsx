@@ -14,8 +14,6 @@ export default async function DepartmentDetailPage({
     getDepartment(id),
     getFormOptions(),
   ]);
-
   if (!department) notFound();
-
-  return <DepartmentForm managers={options.managers} department={department} />;
+  return <DepartmentForm options={options} department={department} />;
 }

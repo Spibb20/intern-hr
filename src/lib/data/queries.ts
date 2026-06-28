@@ -1,152 +1,267 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { prisma } from "@/lib/db/prisma";
-import type {
-  ConfigModel,
-  Department,
-  DepartureReason,
-  Employee,
-  EmployeeType,
-  EmployeeWithRelations,
-  JobPosition,
-  Tag,
-  WorkLocation,
-} from "@/lib/types";
+import { CONFIG_DEFS } from "@/lib/config-defs";
+import type { Department, EmployeeWithRelations, Option } from "@/lib/types";
 
-function iso(value: Date | string): string {
-  return value instanceof Date ? value.toISOString() : value;
+const palette = ["#6b7280", "#64748b", "#78716c", "#475569", "#52525b"];
+
+function text(value: unknown): string {
+  return value == null ? "" : String(value).trim();
 }
 
-function dateOnly(value: Date | null | undefined): string {
-  return value ? value.toISOString().slice(0, 10) : "";
+function id(value: unknown): string | null {
+  return value == null ? null : String(value);
 }
 
-function mapDepartment(d: any): Department {
+function dateOnly(value: Date | string | null | undefined): string {
+  if (!value) return "";
+  const date = value instanceof Date ? value : new Date(value);
+  return Number.isNaN(date.getTime()) ? "" : date.toISOString().slice(0, 10);
+}
+
+function decimal(value: unknown): string {
+  if (value == null) return "0";
+  return String(value);
+}
+
+function num(value: unknown): number {
+  if (typeof value === "number") return value;
+  const parsed = Number(value ?? 0);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function colorFor(value: unknown): string {
+  return palette[Math.abs(num(value)) % palette.length];
+}
+
+function activeFrom(row: Record<string, unknown>): boolean {
+  const status = text(row.status).toLowerCase();
+  const died = text(row.died).toLowerCase();
+  return status !== "inactive" && status !== "fired" && died !== "yes";
+}
+
+function displayName(row: Record<string, unknown>): string {
+  const full = text(row.fullname);
+  if (full) return full;
+  return (
+    [text(row.surname), text(row.name)].filter(Boolean).join(" ") ||
+    `Employee ${row.employee_id}`
+  );
+}
+
+function relation(
+  row: unknown,
+  idKey: string,
+  labelKey: string
+): Option | null {
+  if (!row || typeof row !== "object") return null;
+  const record = row as Record<string, unknown>;
+  const value = record[idKey];
+  if (value == null) return null;
+  return { id: String(value), name: text(record[labelKey]) || String(value) };
+}
+
+function mapDepartment(row: Record<string, unknown>): Department {
+  const parent = row.parent as Record<string, unknown> | undefined;
+  const shift = row.shift as Record<string, unknown> | undefined;
+  const office = row.office as Record<string, unknown> | undefined;
   return {
-    id: d.id,
-    name: d.name,
-    parentId: d.parentId,
-    managerId: d.managerId,
-    color: d.color,
-    createdAt: iso(d.createdAt),
-    updatedAt: iso(d.updatedAt),
+    id: String(row.dep_id),
+    name: text(row.name) || `Хэлтэс ${row.dep_id}`,
+    parentId: id(row.parent_id),
+    parentName: parent ? text(parent.name) : null,
+    scheduleId: id(row.schedule),
+    scheduleName: shift ? text(shift.name) : null,
+    officeId: id(row.office_ident),
+    officeName: office ? text(office.name) : null,
+    color: colorFor(row.dep_id),
   };
 }
 
-function mapJobPosition(j: any): JobPosition {
-  return {
-    id: j.id,
-    name: j.name,
-    departmentId: j.departmentId,
-    createdAt: iso(j.createdAt),
-    updatedAt: iso(j.updatedAt),
+function mapEmployee(row: Record<string, unknown>): EmployeeWithRelations {
+  const department = row.dep
+    ? mapDepartment(row.dep as Record<string, unknown>)
+    : null;
+  const branch = relation(row.branch, "branch_id", "description");
+  const office = relation(row.office, "office_id", "name");
+  const marital = relation(
+    row.marital_status,
+    "maritalstatus_id",
+    "description"
+  );
+  const employee: EmployeeWithRelations = {
+    id: String(row.employee_id),
+    employeeId: num(row.employee_id),
+    name: displayName(row),
+    firstName: text(row.name),
+    surname: text(row.surname),
+    ovog: text(row.ovog),
+    urgiinOvog: text(row.urgiin_ovog),
+    empno: text(row.empno),
+    registerno: text(row.registerno),
+    gender: text(row.gender),
+    birthday: dateOnly(row.birthday as Date | null),
+    email: text(row.email),
+    workphone: text(row.workphone),
+    homephone: text(row.homephone),
+    phone2: text(row.phone2),
+    post: text(row.post),
+    status: text(row.status) || "active",
+    active: activeFrom(row),
+    photoUrl: text(row.photo_url) || null,
+    depIdent: id(row.dep_ident),
+    occupationIdent: id(row.occupation_ident),
+    occupationIdent2: id(row.occupation_ident2),
+    educationIdent: id(row.education_ident),
+    graduateIdent: id(row.graduate_ident),
+    wskillIdent: id(row.wskill_ident),
+    branchIdent: id(row.branch_ident),
+    bankIdent: id(row.bank_ident),
+    schedule: id(row.schedule),
+    officeIdent: id(row.office_ident),
+    nationalityIdent: id(row.nationality_ident),
+    countryIdent: id(row.country_ident),
+    maritalstatusIdent: id(row.maritalstatus_ident),
+    apartcondIdent: id(row.apartcond_ident),
+    carowncondIdent: id(row.carowncond_ident),
+    degreeIdent: id(row.degree_ident),
+    insurIdent: id(row.insur_ident),
+    firedreasonIdent: id(row.firedreason_ident),
+    clothessizeIdent: id(row.clothessize_ident),
+    shoessizeIdent: id(row.shoessize_ident),
+    salary: decimal(row.salary),
+    workingYear: num(row.working_year),
+    workyearSector: num(row.workyear_sector),
+    inworkdate: dateOnly(row.inworkdate as Date | null),
+    gDate: dateOnly(row.g_date as Date | null),
+    gEnddate: dateOnly(row.g_enddate as Date | null),
+    managerExp: text(row.manager_exp) || "no",
+    contractEmp: text(row.contract_emp) || "no",
+    jobType: text(row.job_type),
+    jobFigure: text(row.job_figure) || "Main",
+    passport: text(row.passport),
+    ndno: text(row.ndno),
+    emdno: text(row.emdno),
+    ibankNumber: text(row.ibank_number),
+    bloodType: text(row.blood_type),
+    grade: text(row.grade),
+    gradeLevel: text(row.grade_level),
+    gradePerc: decimal(row.grade_perc),
+    perc1: decimal(row.perc1),
+    perc2: decimal(row.perc2),
+    salPercent: decimal(row.sal_percent),
+    salAmount: decimal(row.sal_amount),
+    gradeAmount: decimal(row.grade_amount),
+    commandNo: text(row.command_no),
+    commandDescription: text(row.command_description),
+    etaxCode: text(row.etax_code),
+    department,
+    jobPosition: relation(row.occupation, "occupation_id", "description"),
+    jobPosition2: relation(row.occupation2, "occupation_id", "description"),
+    education: relation(row.education, "education_id", "description"),
+    graduate: relation(row.graduate, "graduate_id", "description"),
+    workSkill: relation(row.work_skill, "wskill_id", "description"),
+    bank: relation(row.bank, "bank_id", "description"),
+    branch,
+    shift: relation(row.shift, "id", "name"),
+    office,
+    nationality: relation(row.nationality, "nationality_id", "description"),
+    country: relation(row.country, "country_ident", "description"),
+    maritalStatus: marital,
+    apartmentCondition: relation(
+      row.apartment_cond,
+      "apartcond_id",
+      "description"
+    ),
+    carOwnershipCondition: relation(
+      row.carown_cond,
+      "carowncond_id",
+      "description"
+    ),
+    degree: relation(row.degree, "degree_id", "description"),
+    insuranceType: relation(row.insur_type, "insur_id", "description"),
+    firedReason: relation(row.fired_reason, "firedreason_id", "description"),
+    clothesSize: relation(row.clothes_size, "typeid", "clothessize"),
+    shoesSize: relation(row.shoes_size, "typeid", "clothessize"),
+    kanbanState: activeFrom(row) ? "normal" : "blocked",
+    workEmail: text(row.email),
+    workPhone: text(row.workphone),
+    workMobile: text(row.phone2) || text(row.homephone),
+    avatarUrl: text(row.photo_url) || null,
+    tagIds: [],
+    jobTitle: text(row.post),
+    departmentId: id(row.dep_ident),
+    managerId: null,
+    employeeTypeId: null,
+    workLocationId: id(row.office_ident),
+    company: branch?.name ?? "",
+    privateEmail: text(row.email),
+    privatePhone: text(row.homephone),
+    privateAddress: "",
+    dateOfBirth: dateOnly(row.birthday as Date | null),
+    maritalStatusText: marital?.name ?? "",
+    monthlyHours: 0,
+    tags: [],
   };
-}
-
-function mapEmployeeType(t: any): EmployeeType {
-  return {
-    id: t.id,
-    name: t.name,
-    createdAt: iso(t.createdAt),
-    updatedAt: iso(t.updatedAt),
-  };
-}
-
-function mapWorkLocation(w: any): WorkLocation {
-  return {
-    id: w.id,
-    name: w.name,
-    address: w.address,
-    locationType: w.locationType,
-    createdAt: iso(w.createdAt),
-    updatedAt: iso(w.updatedAt),
-  };
-}
-
-function mapTag(t: any): Tag {
-  return {
-    id: t.id,
-    name: t.name,
-    color: t.color,
-    createdAt: iso(t.createdAt),
-    updatedAt: iso(t.updatedAt),
-  };
-}
-
-function mapDepartureReason(d: any): DepartureReason {
-  return {
-    id: d.id,
-    name: d.name,
-    createdAt: iso(d.createdAt),
-    updatedAt: iso(d.updatedAt),
-  };
-}
-
-function mapEmployee(e: any): Employee {
-  return {
-    id: e.id,
-    name: e.name,
-    active: e.active,
-    workEmail: e.workEmail,
-    workPhone: e.workPhone,
-    workMobile: e.workMobile,
-    avatarUrl: e.avatarUrl,
-    tagIds: e.tags?.map((item: any) => item.tagId) ?? [],
-    jobPositionId: e.jobPositionId,
-    jobTitle: e.jobTitle,
-    departmentId: e.departmentId,
-    managerId: e.managerId,
-    employeeTypeId: e.employeeTypeId,
-    workLocationId: e.workLocationId,
-    company: e.company,
-    privateEmail: e.privateEmail,
-    privatePhone: e.privatePhone,
-    privateAddress: e.privateAddress,
-    gender: e.gender ?? "",
-    dateOfBirth: dateOnly(e.dateOfBirth),
-    nationality: e.nationality,
-    maritalStatus: e.maritalStatus ?? "",
-    monthlyHours: e.monthlyHours,
-    kanbanState: e.kanbanState,
-    createdAt: iso(e.createdAt),
-    updatedAt: iso(e.updatedAt),
-  };
-}
-
-function mapEmployeeWithRelations(e: any): EmployeeWithRelations {
-  return {
-    ...mapEmployee(e),
-    department: e.department ? mapDepartment(e.department) : null,
-    jobPosition: e.jobPosition ? mapJobPosition(e.jobPosition) : null,
-    employeeType: e.employeeType ? mapEmployeeType(e.employeeType) : null,
-    workLocation: e.workLocation ? mapWorkLocation(e.workLocation) : null,
-    manager: e.manager ? mapEmployee(e.manager) : null,
-    tags: e.tags?.map((item: any) => mapTag(item.tag)) ?? [],
-  };
+  return employee;
 }
 
 const employeeInclude = {
-  department: true,
-  jobPosition: true,
-  employeeType: true,
-  workLocation: true,
-  manager: { include: { tags: true } },
-  tags: { include: { tag: true } },
+  dep: { include: { parent: true, shift: true, office: true } },
+  occupation: true,
+  occupation2: true,
+  education: true,
+  graduate: true,
+  work_skill: true,
+  bank: true,
+  branch: true,
+  shift: true,
+  office: true,
+  nationality: true,
+  country: true,
+  marital_status: true,
+  apartment_cond: true,
+  carown_cond: true,
+  degree: true,
+  insur_type: true,
+  fired_reason: true,
+  clothes_size: true,
+  shoes_size: true,
 };
 
-export async function getDepartments(): Promise<Department[]> {
-  const rows = await prisma.department.findMany({ orderBy: { name: "asc" } });
-  return rows.map(mapDepartment);
+function toInt(value?: string | null): number | undefined {
+  if (!value) return undefined;
+  const parsed = Number(value);
+  return Number.isInteger(parsed) ? parsed : undefined;
 }
 
-export async function getDepartment(id: string): Promise<Department | null> {
-  const row = await prisma.department.findUnique({ where: { id } });
-  return row ? mapDepartment(row) : null;
+export async function getDepartments(): Promise<Department[]> {
+  const rows = await prisma.deps.findMany({
+    orderBy: { name: "asc" },
+    include: { parent: true, shift: true, office: true },
+  });
+  return rows.map((row: unknown) =>
+    mapDepartment(row as unknown as Record<string, unknown>)
+  );
+}
+
+export async function getDepartment(
+  idValue: string
+): Promise<Department | null> {
+  const depId = toInt(idValue);
+  if (depId == null) return null;
+  const row = await prisma.deps.findUnique({
+    where: { dep_id: depId },
+    include: { parent: true, shift: true, office: true },
+  });
+  return row ? mapDepartment(row as unknown as Record<string, unknown>) : null;
 }
 
 export async function countEmployeesByDepartment(
   departmentId: string
 ): Promise<number> {
-  return prisma.employee.count({ where: { active: true, departmentId } });
+  const depId = toInt(departmentId);
+  if (depId == null) return 0;
+  return prisma.employee.count({ where: { dep_ident: depId } });
 }
 
 export interface DepartmentWithCount extends Department {
@@ -157,19 +272,27 @@ export interface DepartmentWithCount extends Department {
 export async function getDepartmentsWithCounts(): Promise<
   DepartmentWithCount[]
 > {
-  const rows = await prisma.department.findMany({
+  const rows = await prisma.deps.findMany({
     orderBy: { name: "asc" },
     include: {
-      manager: { select: { name: true } },
-      _count: { select: { employees: { where: { active: true } } } },
+      parent: true,
+      shift: true,
+      office: true,
+      _count: { select: { employees: true } },
     },
   });
-
-  return rows.map((d: any) => ({
-    ...mapDepartment(d),
-    employeeCount: d._count.employees,
-    managerName: d.manager?.name ?? null,
-  }));
+  return rows.map((row: unknown) => {
+    const record = row as unknown as Record<string, unknown> & {
+      _count: { employees: number };
+    };
+    return {
+      ...mapDepartment(record),
+      employeeCount: record._count.employees,
+      managerName: record.parent
+        ? text((record.parent as Record<string, unknown>).name)
+        : null,
+    };
+  });
 }
 
 export interface EmployeeQuery {
@@ -180,126 +303,193 @@ export interface EmployeeQuery {
 export async function getEmployees(
   query: EmployeeQuery = {}
 ): Promise<EmployeeWithRelations[]> {
+  const depId = toInt(query.departmentId);
+  const search = text(query.search);
   const rows = await prisma.employee.findMany({
     where: {
-      active: true,
-      ...(query.departmentId ? { departmentId: query.departmentId } : {}),
-      ...(query.search
+      ...(depId != null ? { dep_ident: depId } : {}),
+      ...(search
         ? {
             OR: [
-              { name: { contains: query.search, mode: "insensitive" } },
-              { workEmail: { contains: query.search, mode: "insensitive" } },
-              { jobTitle: { contains: query.search, mode: "insensitive" } },
+              { name: { contains: search, mode: "insensitive" } },
+              { surname: { contains: search, mode: "insensitive" } },
+              { fullname: { contains: search, mode: "insensitive" } },
+              { email: { contains: search, mode: "insensitive" } },
+              { post: { contains: search, mode: "insensitive" } },
+              { registerno: { contains: search, mode: "insensitive" } },
+              { empno: { contains: search, mode: "insensitive" } },
             ],
           }
         : {}),
     },
-    orderBy: { name: "asc" },
+    orderBy: [{ employee_id: "desc" }],
     include: employeeInclude,
   });
-  return rows.map(mapEmployeeWithRelations);
+  return rows.map((row: unknown) =>
+    mapEmployee(row as unknown as Record<string, unknown>)
+  );
 }
 
 export async function getEmployee(
-  id: string
+  idValue: string
 ): Promise<EmployeeWithRelations | null> {
+  const employeeId = toInt(idValue);
+  if (employeeId == null) return null;
   const row = await prisma.employee.findUnique({
-    where: { id },
+    where: { employee_id: employeeId },
     include: employeeInclude,
   });
-  return row ? mapEmployeeWithRelations(row) : null;
+  return row ? mapEmployee(row as unknown as Record<string, unknown>) : null;
 }
 
-export async function getJobPositions(): Promise<JobPosition[]> {
-  return (await prisma.jobPosition.findMany({ orderBy: { name: "asc" } })).map(
-    mapJobPosition
-  );
-}
-
-export async function getEmployeeTypes(): Promise<EmployeeType[]> {
-  return (await prisma.employeeType.findMany({ orderBy: { name: "asc" } })).map(
-    mapEmployeeType
-  );
-}
-
-export async function getWorkLocations(): Promise<WorkLocation[]> {
-  return (await prisma.workLocation.findMany({ orderBy: { name: "asc" } })).map(
-    mapWorkLocation
-  );
-}
-
-export async function getTags(): Promise<Tag[]> {
-  return (await prisma.tag.findMany({ orderBy: { name: "asc" } })).map(mapTag);
-}
-
-export async function getDepartureReasons(): Promise<DepartureReason[]> {
-  return (
-    await prisma.departureReason.findMany({ orderBy: { name: "asc" } })
-  ).map(mapDepartureReason);
+function normalizeConfigRow(
+  model: string,
+  row: Record<string, unknown>
+): Record<string, unknown> {
+  const def = CONFIG_DEFS[model];
+  const output: Record<string, unknown> = { id: String(row[def.idKey]) };
+  for (const field of def.fields) {
+    output[field.key] =
+      field.type === "date"
+        ? dateOnly(row[field.key] as Date | null)
+        : row[field.key] == null
+        ? ""
+        : String(row[field.key]).trim();
+  }
+  return output;
 }
 
 export async function getConfigRows(
-  model: ConfigModel
+  model: string
 ): Promise<Record<string, unknown>[]> {
-  switch (model) {
-    case "job-positions":
-      return (await getJobPositions()) as unknown as Record<string, unknown>[];
-    case "employee-types":
-      return (await getEmployeeTypes()) as unknown as Record<string, unknown>[];
-    case "work-locations":
-      return (await getWorkLocations()) as unknown as Record<string, unknown>[];
-    case "tags":
-      return (await getTags()) as unknown as Record<string, unknown>[];
-    case "departure-reasons":
-      return (await getDepartureReasons()) as unknown as Record<
-        string,
-        unknown
-      >[];
-  }
+  const def = CONFIG_DEFS[model];
+  if (!def) return [];
+  const delegate = (
+    prisma as unknown as Record<
+      string,
+      { findMany: (args: unknown) => Promise<Record<string, unknown>[]> }
+    >
+  )[def.prisma];
+  const rows = await delegate.findMany({
+    orderBy: { [def.orderBy ?? def.labelKey]: "asc" },
+  });
+  return rows.map((row: Record<string, unknown>) =>
+    normalizeConfigRow(model, row)
+  );
 }
 
-export async function getFormOptions() {
+async function optionsFrom(model: string): Promise<Option[]> {
+  const def = CONFIG_DEFS[model];
+  const delegate = (
+    prisma as unknown as Record<
+      string,
+      { findMany: (args: unknown) => Promise<Record<string, unknown>[]> }
+    >
+  )[def.prisma];
+  const rows = await delegate.findMany({
+    orderBy: { [def.orderBy ?? def.labelKey]: "asc" },
+  });
+  return rows.map((row: Record<string, unknown>) => ({
+    id: String(row[def.idKey]),
+    name: text(row[def.labelKey]) || String(row[def.idKey]),
+  }));
+}
+
+export async function getFormOptions(): Promise<Record<string, Option[]>> {
   const [
     departments,
-    jobPositions,
-    employeeTypes,
-    workLocations,
-    tags,
-    managers,
+    occupations,
+    educations,
+    graduates,
+    banks,
+    branches,
+    shifts,
+    schedules,
+    offices,
+    workSkills,
+    maritalStatuses,
+    nationalities,
+    countries,
+    degrees,
+    insuranceTypes,
+    firedReasons,
+    apartmentConds,
+    carownConds,
+    clothesSizes,
+    cities,
   ] = await Promise.all([
-    prisma.department.findMany({
-      orderBy: { name: "asc" },
-      select: { id: true, name: true },
-    }),
-    prisma.jobPosition.findMany({
-      orderBy: { name: "asc" },
-      select: { id: true, name: true },
-    }),
-    prisma.employeeType.findMany({
-      orderBy: { name: "asc" },
-      select: { id: true, name: true },
-    }),
-    prisma.workLocation.findMany({
-      orderBy: { name: "asc" },
-      select: { id: true, name: true },
-    }),
-    prisma.tag.findMany({
-      orderBy: { name: "asc" },
-      select: { id: true, name: true, color: true },
-    }),
-    prisma.employee.findMany({
-      where: { active: true },
-      orderBy: { name: "asc" },
-      select: { id: true, name: true },
-    }),
+    getDepartments().then((rows) =>
+      rows.map((row) => ({ id: row.id, name: row.name, color: row.color }))
+    ),
+    optionsFrom("occupations"),
+    optionsFrom("education"),
+    optionsFrom("graduates"),
+    optionsFrom("banks"),
+    optionsFrom("branches"),
+    optionsFrom("shifts"),
+    optionsFrom("schedules"),
+    optionsFrom("offices"),
+    optionsFrom("work-skills"),
+    optionsFrom("marital-status"),
+    optionsFrom("nationalities"),
+    optionsFrom("countries"),
+    optionsFrom("degrees"),
+    optionsFrom("insurance-types"),
+    optionsFrom("fired-reasons"),
+    optionsFrom("apartment-conditions"),
+    optionsFrom("car-ownership"),
+    optionsFrom("clothes-sizes"),
+    optionsFrom("cities"),
   ]);
 
   return {
     departments,
-    jobPositions,
-    employeeTypes,
-    workLocations,
-    tags,
-    managers,
+    occupations,
+    jobPositions: occupations,
+    educations,
+    employeeTypes: [],
+    workLocations: offices,
+    tags: [],
+    managers: [],
+    graduates,
+    banks,
+    branches,
+    shifts,
+    schedules,
+    offices,
+    workSkills,
+    maritalStatuses,
+    nationalities,
+    countries,
+    degrees,
+    insuranceTypes,
+    firedReasons,
+    apartmentConds,
+    carownConds,
+    clothesSizes,
+    cities,
+  };
+}
+
+export async function getDashboardStats() {
+  const [
+    employeeCount,
+    departmentCount,
+    occupationCount,
+    educationCount,
+    recentEmployees,
+  ] = await Promise.all([
+    prisma.employee.count(),
+    prisma.deps.count(),
+    prisma.occupation.count(),
+    prisma.education.count(),
+    getEmployees(),
+  ]);
+  return {
+    employeeCount,
+    departmentCount,
+    occupationCount,
+    educationCount,
+    recentEmployees: recentEmployees.slice(0, 8),
   };
 }

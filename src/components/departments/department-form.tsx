@@ -4,7 +4,6 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Check, X } from "lucide-react";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -14,142 +13,149 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createDepartment, updateDepartment } from "@/lib/actions";
-import type { Department } from "@/lib/types";
-
-interface Option {
-  id: string;
-  name: string;
-}
-
-const PALETTE = [
-  "#22d3ee",
-  "#d946a6",
-  "#34d399",
-  "#f59e0b",
-  "#60a5fa",
-  "#f87171",
-];
+import type { Department, Option } from "@/lib/types";
 
 export function DepartmentForm({
-  managers,
+  options,
   department,
 }: {
-  managers: Option[];
+  options: Record<string, Option[]>;
   department?: Department;
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [name, setName] = useState(department?.name ?? "");
-  const [managerId, setManagerId] = useState<string | null>(
-    department?.managerId ?? null
+  const [parentId, setParentId] = useState<string | null>(
+    department?.parentId ?? null
   );
-  const [color, setColor] = useState(department?.color ?? PALETTE[0]);
+  const [schedule, setSchedule] = useState<string | null>(
+    department?.scheduleId ?? null
+  );
+  const [officeIdent, setOfficeIdent] = useState<string | null>(
+    department?.officeId ?? null
+  );
 
-  function handleSave() {
+  function save() {
     if (!name.trim()) {
-      toast.error("Хэлтэсийн нэршил оруулах шаардлагатай");
+      toast.error("Хэлтэсийн нэр оруулах шаардлагатай");
       return;
     }
     startTransition(async () => {
       try {
         if (department) {
-          await updateDepartment(department.id, { name, managerId, color });
-          toast.success("Department updated");
+          await updateDepartment(department.id, {
+            name,
+            parentId,
+            schedule,
+            officeIdent,
+          });
+          toast.success("Хэлтэс шинэчлэгдлээ");
         } else {
-          await createDepartment({ name, managerId, color });
-          toast.success("Department created");
+          await createDepartment({ name, parentId, schedule, officeIdent });
+          toast.success("Хэлтэс нэмэгдлээ");
         }
         router.push("/departments");
         router.refresh();
-      } catch (err) {
-        toast.error(
-          err instanceof Error ? err.message : "Something went wrong"
-        );
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Алдаа гарлаа");
       }
     });
   }
 
   return (
     <div className="flex flex-col">
-      <div className="flex items-center gap-2 border-b border-border/70 bg-control-bar/95 px-4 py-3">
+      <div className="flex items-center gap-2 border-b bg-control-bar px-4 py-3">
         <button
           type="button"
-          onClick={handleSave}
+          onClick={save}
           disabled={isPending}
-          className="flex items-center gap-1.5 rounded-lg bg-accent-foreground px-3.5 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
         >
           <Check className="size-4" /> Хадгалах
         </button>
         <button
           type="button"
           onClick={() => router.push("/departments")}
-          className="flex items-center gap-1.5 rounded-lg border border-border bg-background/60 px-3.5 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent"
+          className="inline-flex items-center gap-1.5 rounded-md border bg-background px-3 py-2 text-sm text-muted-foreground hover:bg-accent"
         >
-          <X className="size-4" /> Устгах
+          <X className="size-4" /> Цуцлах
         </button>
-        <span className="ml-1 flex flex-col leading-tight">
-          <span className="text-[13px] font-medium text-brand-teal">
-            Хэлтэс
-          </span>
-          <span className="text-xs text-muted-foreground">
-            {department ? department.name : "Шинээр нэмэх"}
-          </span>
-        </span>
-      </div>
-
-      <div className="mx-auto w-full max-w-2xl px-4 py-8">
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Шинээр нэмэх хэлтэсийн нэршилийг оруулна уу."
-          className="w-full rounded-xl bg-background/35 px-3 py-2 text-2xl font-semibold outline-none placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-brand-purple/15"
-        />
-
-        <div className="mt-6 flex flex-col gap-5">
-          <div className="grid grid-cols-1 items-center gap-2 sm:grid-cols-[140px_1fr] sm:gap-3">
-            <Label className="text-sm font-medium text-foreground/105">
-              Удирдлага
-            </Label>
-            <Select
-              value={managerId ?? "__none"}
-              onValueChange={(v) => setManagerId(v === "__none" ? null : v)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="__none">—</SelectItem>
-                {managers.map((m) => (
-                  <SelectItem key={m.id} value={m.id}>
-                    {m.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="grid grid-cols-1 items-center gap-2 sm:grid-cols-[140px_1fr] sm:gap-3">
-            <Label className="text-sm font-medium text-foreground/105">
-              Хэлтэсийг тодорхойлох өнгө
-            </Label>
-            <div className="flex gap-2">
-              {PALETTE.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => setColor(c)}
-                  className={cn(
-                    "size-6 rounded-full ring-offset-2 ring-offset-background transition",
-                    color === c && "ring-2 ring-foreground"
-                  )}
-                  style={{ backgroundColor: c }}
-                  aria-label={`Color ${c}`}
-                />
-              ))}
-            </div>
+        <div className="ml-2 leading-tight">
+          <div className="text-sm font-semibold">Хэлтэс</div>
+          <div className="text-xs text-muted-foreground">
+            {department ? department.name : "Шинэ бүртгэл"}
           </div>
         </div>
       </div>
+
+      <div className="mx-auto w-full max-w-2xl px-4 py-6">
+        <div className="rounded-md border bg-card p-4">
+          <div className="grid gap-4">
+            <label className="grid gap-1.5 text-sm">
+              <span className="font-medium">Хэлтэсийн нэр</span>
+              <input
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                className="soft-input text-lg font-semibold"
+              />
+            </label>
+            <FieldSelect
+              label="Дээд хэлтэс"
+              value={parentId}
+              options={(options.departments ?? []).filter(
+                (item) => item.id !== department?.id
+              )}
+              onChange={setParentId}
+            />
+            <FieldSelect
+              label="Ээлж"
+              value={schedule}
+              options={options.shifts ?? []}
+              onChange={setSchedule}
+            />
+            <FieldSelect
+              label="Оффис"
+              value={officeIdent}
+              options={options.offices ?? []}
+              onChange={setOfficeIdent}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FieldSelect({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: string | null;
+  options: Option[];
+  onChange: (value: string | null) => void;
+}) {
+  return (
+    <div className="grid gap-1.5 text-sm">
+      <Label className="font-medium">{label}</Label>
+      <Select
+        value={value ?? "__none"}
+        onValueChange={(next) => onChange(next === "__none" ? null : next)}
+      >
+        <SelectTrigger className="bg-background">
+          <SelectValue placeholder="Сонгох" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="__none">—</SelectItem>
+          {options.map((option) => (
+            <SelectItem key={option.id} value={option.id}>
+              {option.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 }

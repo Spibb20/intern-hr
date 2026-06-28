@@ -22,71 +22,64 @@ export function DepartmentBoard({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  function handleDelete(id: string, name: string) {
+  function remove(id: string, name: string) {
     startTransition(async () => {
       try {
         await deleteDepartment(id);
-        toast.success(`Deleted ${name}`);
+        toast.success(`${name} устлаа`);
         router.refresh();
-      } catch (err) {
-        toast.error(
-          err instanceof Error ? err.message : "Something went wrong"
-        );
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Алдаа гарлаа");
       }
     });
   }
 
   if (departments.length === 0) {
     return (
-      <div className="py-24 text-center text-sm text-muted-foreground">
-        Одоогоор салбар байхгүа байна.{" "}
-        <Link
-          href="/departments/new"
-          className="text-brand-teal hover:underline"
-        >
-          Хэлтэс шинээр нээх
+      <div className="py-20 text-center text-sm text-muted-foreground">
+        Хэлтэс байхгүй байна.{" "}
+        <Link href="/departments/new" className="text-foreground underline">
+          Шинээр нэмэх
         </Link>
-        .
       </div>
     );
   }
 
   return (
-    <div className="grid gap-4 p-4 md:grid-cols-2 2xl:grid-cols-3">
-      {departments.map((dep) => (
+    <div className="grid gap-3 p-4 md:grid-cols-2 2xl:grid-cols-3">
+      {departments.map((department) => (
         <div
-          key={dep.id}
-          className="group relative overflow-hidden rounded-2xl border border-border bg-background/55 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
-          style={{ borderLeft: `3px solid ${dep.color}` }}
+          key={department.id}
+          className="group rounded-md border bg-card p-4 transition-colors hover:border-foreground/25"
         >
-          <div className="flex items-start justify-between p-4">
-            <Link href={`/departments/${dep.id}`} className="min-w-0">
-              <h3 className="text-lg font-semibold text-brand-teal hover:underline">
-                {dep.name}
+          <div className="flex items-start justify-between gap-3">
+            <Link href={`/departments/${department.id}`} className="min-w-0">
+              <h3 className="truncate text-base font-semibold hover:underline">
+                {department.name}
               </h3>
-              {dep.managerName && (
-                <p className="text-sm text-muted-foreground">
-                  {dep.managerName}
-                </p>
-              )}
+              <p className="mt-1 text-sm text-muted-foreground">
+                {department.parentName
+                  ? `Дээд: ${department.parentName}`
+                  : "Дээд хэлтэсгүй"}
+              </p>
             </Link>
             <DropdownMenu>
               <DropdownMenuTrigger
                 aria-label="Department options"
-                className="rounded-lg p-1 text-muted-foreground opacity-0 transition-opacity hover:bg-accent group-hover:opacity-100"
+                className="rounded-md p-1 text-muted-foreground hover:bg-accent"
               >
                 <MoreVertical className="size-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
-                  <Link href={`/departments/${dep.id}`}>Засах</Link>
+                  <Link href={`/departments/${department.id}`}>Засах</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   variant="destructive"
                   disabled={isPending}
-                  onSelect={(e) => {
-                    e.preventDefault();
-                    handleDelete(dep.id, dep.name);
+                  onSelect={(event) => {
+                    event.preventDefault();
+                    remove(department.id, department.name);
                   }}
                 >
                   <Trash2 className="size-4" /> Устгах
@@ -94,12 +87,13 @@ export function DepartmentBoard({
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          <div className="px-4 pb-4">
+          <div className="mt-4 flex items-center justify-between border-t pt-3 text-sm text-muted-foreground">
+            <span>{department.officeName ?? "Оффисгүй"}</span>
             <Link
-              href={`/employees?department=${dep.id}`}
-              className="inline-flex rounded-lg bg-brand-purple/15 px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-brand-purple/25"
+              href={`/employees?department=${department.id}`}
+              className="hover:underline"
             >
-              Уг хэлтэст байгаа ажилчдын тоо: {dep.employeeCount}
+              {department.employeeCount} ажилтан
             </Link>
           </div>
         </div>

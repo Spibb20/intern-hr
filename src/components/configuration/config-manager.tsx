@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,12 +42,12 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   createConfigItem,
-  updateConfigItem,
   deleteConfigItem,
+  updateConfigItem,
 } from "@/lib/actions";
-import type { ConfigModel } from "@/lib/types";
+import type { FieldType } from "@/lib/types";
 
-export type FieldType = "text" | "color" | "select";
+export type { FieldType } from "@/lib/types";
 
 export interface FieldDef {
   key: string;
@@ -59,7 +59,7 @@ export interface FieldDef {
 }
 
 export interface ConfigManagerProps {
-  model: ConfigModel;
+  model: string;
   rows: Record<string, unknown>[];
   fields: FieldDef[];
   relatedLabels?: Record<string, Record<string, string>>;
@@ -67,9 +67,8 @@ export interface ConfigManagerProps {
 
 function emptyDraft(fields: FieldDef[]) {
   const draft: Record<string, string> = {};
-  fields.forEach((f) => {
-    draft[f.key] = f.type === "color" ? "#b45309" : "";
-  });
+  for (const field of fields)
+    draft[field.key] = field.type === "color" ? "#6b7280" : "";
   return draft;
 }
 
@@ -97,108 +96,96 @@ export function ConfigManager({
   function openEdit(row: Record<string, unknown>) {
     setEditingId(String(row.id));
     const next: Record<string, string> = {};
-    fields.forEach((f) => {
-      next[f.key] =
-        row[f.key] != null
-          ? String(row[f.key])
-          : f.type === "color"
-          ? "#b45309"
-          : "";
-    });
+    for (const field of fields)
+      next[field.key] = row[field.key] != null ? String(row[field.key]) : "";
     setDraft(next);
     setDialogOpen(true);
   }
 
-  function handleSave() {
-    const nameField = fields[0];
-    if (nameField.required && !draft[nameField.key]?.trim()) {
-      toast.error(`${nameField.label} is required`);
+  function save() {
+    const required = fields.find(
+      (field) => field.required && !draft[field.key]?.trim()
+    );
+    if (required) {
+      toast.error(`${required.label} шаардлагатай`);
       return;
     }
     startTransition(async () => {
       try {
         if (editingId) {
           await updateConfigItem(model, editingId, draft);
-          toast.success("Record updated");
+          toast.success("Мэдээлэл шинэчлэгдлээ");
         } else {
           await createConfigItem(model, draft);
-          toast.success("Record created");
+          toast.success("Мэдээлэл нэмэгдлээ");
         }
         setDialogOpen(false);
         router.refresh();
-      } catch (err) {
-        toast.error(
-          err instanceof Error ? err.message : "Something went wrong"
-        );
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Алдаа гарлаа");
       }
     });
   }
 
-  function handleDelete() {
+  function remove() {
     if (!deleteId) return;
     startTransition(async () => {
       try {
         await deleteConfigItem(model, deleteId);
-        toast.success("Record deleted");
+        toast.success("Мэдээлэл устлаа");
         setDeleteId(null);
         router.refresh();
-      } catch (err) {
-        toast.error(
-          err instanceof Error ? err.message : "Something went wrong"
-        );
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Алдаа гарлаа");
       }
     });
   }
 
-  function renderCell(row: Record<string, unknown>, field: FieldDef) {
+  function cell(row: Record<string, unknown>, field: FieldDef) {
     const value = row[field.key];
-    if (field.type === "color") {
-      return (
-        <span className="flex items-center gap-2">
-          <span
-            className="size-4 rounded-full border border-border"
-            style={{ background: String(value || "#b45309") }}
-          />
-          <span className="text-muted-foreground">{String(value || "")}</span>
-        </span>
-      );
-    }
     if (field.type === "select") {
-      const label = relatedLabels[field.key]?.[String(value)] ?? null;
+      const label = relatedLabels[field.key]?.[String(value)] ?? "";
       return label ? (
         <Badge variant="secondary">{label}</Badge>
       ) : (
         <span className="text-muted-foreground">—</span>
       );
     }
-    return (
-      <span>
-        {value ? (
-          String(value)
-        ) : (
-          <span className="text-muted-foreground">—</span>
-        )}
-      </span>
+    if (field.type === "color") {
+      return (
+        <span className="inline-flex items-center gap-2">
+          <span
+            className="size-4 rounded border"
+            style={{ background: String(value || "#6b7280") }}
+          />
+          {String(value || "")}
+        </span>
+      );
+    }
+    return value ? (
+      String(value)
+    ) : (
+      <span className="text-muted-foreground">—</span>
     );
   }
 
   return (
     <div className="px-4 py-4 md:px-6">
-      <div className="mb-3 flex items-center justify-end">
+      <div className="mb-3 flex justify-end">
         <Button size="sm" onClick={openCreate}>
           <Plus className="size-4" />
-          New
+          Шинээр нэмэх
         </Button>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-border bg-background/45 shadow-sm">
+      <div className="overflow-hidden rounded-md border bg-card">
         <Table>
           <TableHeader>
-            <TableRow className="bg-control-bar/90 hover:bg-control-bar">
-              {fields.map((f) => (
-                <TableHead key={f.key}>{f.label}</TableHead>
+            <TableRow>
+              {fields.map((field) => (
+                <TableHead key={field.key}>{field.label}</TableHead>
               ))}
-              <TableHead className="w-24 text-right">Actions</TableHead>
+              <TableHead className="w-24 text-right">Үйлдэл</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -208,14 +195,14 @@ export function ConfigManager({
                   colSpan={fields.length + 1}
                   className="h-24 text-center text-muted-foreground"
                 >
-                  No records yet. Click New to create one.
+                  Мэдээлэл байхгүй байна.
                 </TableCell>
               </TableRow>
             ) : (
               rows.map((row) => (
                 <TableRow key={String(row.id)}>
-                  {fields.map((f) => (
-                    <TableCell key={f.key}>{renderCell(row, f)}</TableCell>
+                  {fields.map((field) => (
+                    <TableCell key={field.key}>{cell(row, field)}</TableCell>
                   ))}
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1">
@@ -226,7 +213,7 @@ export function ConfigManager({
                         onClick={() => openEdit(row)}
                       >
                         <Pencil className="size-4" />
-                        <span className="sr-only">Edit</span>
+                        <span className="sr-only">Засах</span>
                       </Button>
                       <Button
                         variant="ghost"
@@ -235,7 +222,7 @@ export function ConfigManager({
                         onClick={() => setDeleteId(String(row.id))}
                       >
                         <Trash2 className="size-4" />
-                        <span className="sr-only">Delete</span>
+                        <span className="sr-only">Устгах</span>
                       </Button>
                     </div>
                   </TableCell>
@@ -249,35 +236,37 @@ export function ConfigManager({
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              {editingId ? "Edit record" : "New record"}
-            </DialogTitle>
+            <DialogTitle>{editingId ? "Засах" : "Шинээр нэмэх"}</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col gap-4 py-2">
             {fields.map((field) => (
-              <div key={field.key} className="flex flex-col gap-1.5">
+              <div key={field.key} className="grid gap-1.5">
                 <Label htmlFor={field.key}>
                   {field.label}
-                  {field.required && (
+                  {field.required ? (
                     <span className="ml-0.5 text-destructive">*</span>
-                  )}
+                  ) : null}
                 </Label>
                 {field.type === "select" ? (
                   <Select
-                    value={draft[field.key] || undefined}
-                    onValueChange={(v) =>
-                      setDraft((d) => ({ ...d, [field.key]: v ?? "" }))
+                    value={draft[field.key] || "__none"}
+                    onValueChange={(value) =>
+                      setDraft((current) => ({
+                        ...current,
+                        [field.key]: value === "__none" ? "" : value,
+                      }))
                     }
                   >
                     <SelectTrigger id={field.key}>
                       <SelectValue
-                        placeholder={field.placeholder ?? "Select..."}
+                        placeholder={field.placeholder ?? "Сонгох"}
                       />
                     </SelectTrigger>
                     <SelectContent>
-                      {field.options?.map((o) => (
-                        <SelectItem key={o.id} value={o.id}>
-                          {o.name}
+                      <SelectItem value="__none">—</SelectItem>
+                      {field.options?.map((option) => (
+                        <SelectItem key={option.id} value={option.id}>
+                          {option.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -287,27 +276,43 @@ export function ConfigManager({
                     <input
                       type="color"
                       id={field.key}
-                      value={draft[field.key] || "#b45309"}
-                      onChange={(e) =>
-                        setDraft((d) => ({ ...d, [field.key]: e.target.value }))
+                      value={draft[field.key] || "#6b7280"}
+                      onChange={(event) =>
+                        setDraft((current) => ({
+                          ...current,
+                          [field.key]: event.target.value,
+                        }))
                       }
-                      className="h-9 w-14 cursor-pointer rounded-lg border border-border bg-transparent"
+                      className="h-9 w-14 rounded-md border bg-transparent"
                     />
                     <Input
                       value={draft[field.key] || ""}
-                      onChange={(e) =>
-                        setDraft((d) => ({ ...d, [field.key]: e.target.value }))
+                      onChange={(event) =>
+                        setDraft((current) => ({
+                          ...current,
+                          [field.key]: event.target.value,
+                        }))
                       }
-                      placeholder="#b45309"
                     />
                   </div>
                 ) : (
                   <Input
                     id={field.key}
+                    type={
+                      field.type === "number" || field.type === "decimal"
+                        ? "number"
+                        : field.type === "date"
+                        ? "date"
+                        : "text"
+                    }
+                    step={field.type === "decimal" ? "0.01" : undefined}
                     value={draft[field.key] || ""}
                     placeholder={field.placeholder}
-                    onChange={(e) =>
-                      setDraft((d) => ({ ...d, [field.key]: e.target.value }))
+                    onChange={(event) =>
+                      setDraft((current) => ({
+                        ...current,
+                        [field.key]: event.target.value,
+                      }))
                     }
                   />
                 )}
@@ -318,7 +323,7 @@ export function ConfigManager({
             <Button variant="ghost" onClick={() => setDialogOpen(false)}>
               Цуцлах
             </Button>
-            <Button onClick={handleSave} disabled={isPending}>
+            <Button onClick={save} disabled={isPending}>
               Хадгалах
             </Button>
           </DialogFooter>
@@ -331,18 +336,18 @@ export function ConfigManager({
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Үүнийг устгах уу?</AlertDialogTitle>
+            <AlertDialogTitle>Устгах уу?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. The record will be permanently
-              removed.
+              Холбоотой бичлэгтэй бол өгөгдлийн сангийн constraint-ээс шалтгаалж
+              устахгүй байж болно.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Цуцлах</AlertDialogCancel>
             <AlertDialogAction
-              onClick={(e) => {
-                e.preventDefault();
-                handleDelete();
+              onClick={(event) => {
+                event.preventDefault();
+                remove();
               }}
               className="bg-destructive text-white hover:bg-destructive/90"
             >

@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { UsersRound } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { DepartmentWithCount } from "@/lib/data/queries";
 
@@ -23,32 +22,33 @@ export function DepartmentSidebar({
   }
 
   return (
-    <aside className="hidden w-60 shrink-0 border-r border-border/70 bg-background/35 px-3 py-4 md:block">
-      <div className="mb-2 flex items-center gap-2 px-2 text-xs font-semibold uppercase tracking-wide text-brand-teal">
-        <UsersRound className="size-4" />
+    <aside className="hidden w-60 shrink-0 border-r bg-muted/20 p-3 md:block">
+      <div className="mb-2 px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
         Хэлтэс
       </div>
-      <nav className="flex flex-col gap-0.5 text-sm">
+      <nav className="flex flex-col gap-1 text-sm">
         <Link
           href={hrefFor()}
           className={cn(
-            "rounded-lg px-3 py-2 transition-colors hover:bg-accent",
+            "rounded-md px-3 py-2 hover:bg-accent",
             !current && "bg-accent font-medium"
           )}
         >
           Бүгд
         </Link>
-        {departments.map((dep) => (
+        {departments.map((department) => (
           <Link
-            key={dep.id}
-            href={hrefFor(dep.id)}
+            key={department.id}
+            href={hrefFor(department.id)}
             className={cn(
-              "flex items-center justify-between rounded-lg px-3 py-2 transition-colors hover:bg-accent",
-              current === dep.id && "bg-accent font-medium"
+              "flex items-center justify-between rounded-md px-3 py-2 hover:bg-accent",
+              current === department.id && "bg-accent font-medium"
             )}
           >
-            <span>{dep.name}</span>
-            <span className="text-muted-foreground">{dep.employeeCount}</span>
+            <span className="truncate">{department.name}</span>
+            <span className="text-muted-foreground">
+              {department.employeeCount}
+            </span>
           </Link>
         ))}
       </nav>

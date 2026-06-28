@@ -1,22 +1,9 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import {
-  CalendarClock,
-  Check,
-  Clock,
-  DollarSign,
-  History,
-  ImagePlus,
-  Mail,
-  Phone,
-  Smartphone,
-  Tag as TagIcon,
-  X,
-} from "lucide-react";
+import { Check, X } from "lucide-react";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -32,486 +19,527 @@ import {
   updateEmployee,
   type EmployeeInput,
 } from "@/lib/actions";
-import type { EmployeeWithRelations } from "@/lib/types";
-
-interface Option {
-  id: string;
-  name: string;
-  color?: string;
-}
-
-interface FormOptions {
-  departments: Option[];
-  jobPositions: Option[];
-  employeeTypes: Option[];
-  workLocations: Option[];
-  tags: Option[];
-  managers: Option[];
-}
+import type { EmployeeWithRelations, Option } from "@/lib/types";
 
 interface EmployeeFormProps {
-  options?: Partial<FormOptions>;
+  options?: Record<string, Option[]>;
   employee?: EmployeeWithRelations;
 }
 
-const smartButtons = [
-  { icon: DollarSign, label: "Цалингийн хүлээлт", value: "" },
-  { icon: CalendarClock, label: "Амралт/Чөлөө", value: "" },
-  { icon: Clock, label: "Ажилласан цаг/сар", valueKey: "monthlyHours" },
-  { icon: History, label: "Түүх", value: "0" },
-];
+const emptyOptions: Record<string, Option[]> = {};
 
-export function EmployeeForm({ options, employee }: EmployeeFormProps) {
-  const formOptions: FormOptions = {
-    departments: options?.departments ?? [],
-    jobPositions: options?.jobPositions ?? [],
-    employeeTypes: options?.employeeTypes ?? [],
-    workLocations: options?.workLocations ?? [],
-    tags: options?.tags ?? [],
-    managers: options?.managers ?? [],
-  };
+export function EmployeeForm({
+  options = emptyOptions,
+  employee,
+}: EmployeeFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const fileRef = useRef<HTMLInputElement>(null);
-
   const [form, setForm] = useState<EmployeeInput>({
-    name: employee?.name ?? "",
-    workEmail: employee?.workEmail ?? "",
-    workPhone: employee?.workPhone ?? "",
-    workMobile: employee?.workMobile ?? "",
-    avatarUrl: employee?.avatarUrl ?? null,
-    tagIds: employee?.tagIds ?? [],
-    jobPositionId: employee?.jobPositionId ?? null,
-    jobTitle: employee?.jobTitle ?? "",
-    departmentId: employee?.departmentId ?? null,
-    managerId: employee?.managerId ?? null,
-    employeeTypeId: employee?.employeeTypeId ?? null,
-    workLocationId: employee?.workLocationId ?? null,
-    company: employee?.company ?? "My Company",
-    privateEmail: employee?.privateEmail ?? "",
-    privatePhone: employee?.privatePhone ?? "",
-    privateAddress: employee?.privateAddress ?? "",
+    name: employee?.firstName ?? "",
+    surname: employee?.surname ?? "",
+    ovog: employee?.ovog ?? "",
+    urgiinOvog: employee?.urgiinOvog ?? "",
+    empno: employee?.empno ?? "",
+    registerno: employee?.registerno ?? "",
     gender: employee?.gender ?? "",
-    dateOfBirth: employee?.dateOfBirth ?? "",
-    nationality: employee?.nationality ?? "",
-    maritalStatus: employee?.maritalStatus ?? "",
-    monthlyHours: employee?.monthlyHours ?? 0,
-    kanbanState: employee?.kanbanState ?? "normal",
+    birthday: employee?.birthday ?? "",
+    email: employee?.email ?? "",
+    workphone: employee?.workphone ?? "",
+    homephone: employee?.homephone ?? "",
+    phone2: employee?.phone2 ?? "",
+    post: employee?.post ?? "",
+    status: employee?.status ?? "active",
+    photoUrl: employee?.photoUrl ?? "",
+    depIdent: employee?.depIdent ?? null,
+    occupationIdent: employee?.occupationIdent ?? null,
+    occupationIdent2: employee?.occupationIdent2 ?? null,
+    educationIdent: employee?.educationIdent ?? null,
+    graduateIdent: employee?.graduateIdent ?? null,
+    wskillIdent: employee?.wskillIdent ?? null,
+    branchIdent: employee?.branchIdent ?? null,
+    bankIdent: employee?.bankIdent ?? null,
+    schedule: employee?.schedule ?? null,
+    officeIdent: employee?.officeIdent ?? null,
+    nationalityIdent: employee?.nationalityIdent ?? null,
+    countryIdent: employee?.countryIdent ?? null,
+    maritalstatusIdent: employee?.maritalstatusIdent ?? null,
+    apartcondIdent: employee?.apartcondIdent ?? null,
+    carowncondIdent: employee?.carowncondIdent ?? null,
+    degreeIdent: employee?.degreeIdent ?? null,
+    insurIdent: employee?.insurIdent ?? null,
+    firedreasonIdent: employee?.firedreasonIdent ?? null,
+    clothessizeIdent: employee?.clothessizeIdent ?? null,
+    shoessizeIdent: employee?.shoessizeIdent ?? null,
+    salary: employee?.salary ?? "0",
+    workingYear: employee?.workingYear ?? 0,
+    workyearSector: employee?.workyearSector ?? 0,
+    inworkdate: employee?.inworkdate ?? "",
+    gDate: employee?.gDate ?? "",
+    gEnddate: employee?.gEnddate ?? "",
+    managerExp: employee?.managerExp ?? "no",
+    contractEmp: employee?.contractEmp ?? "no",
+    jobType: employee?.jobType ?? "",
+    jobFigure: employee?.jobFigure ?? "Main",
+    passport: employee?.passport ?? "",
+    ndno: employee?.ndno ?? "",
+    emdno: employee?.emdno ?? "",
+    ibankNumber: employee?.ibankNumber ?? "",
+    bloodType: employee?.bloodType ?? "",
+    grade: employee?.grade ?? "",
+    gradeLevel: employee?.gradeLevel ?? "",
+    gradePerc: employee?.gradePerc ?? "0",
+    perc1: employee?.perc1 ?? "0",
+    perc2: employee?.perc2 ?? "0",
+    salPercent: employee?.salPercent ?? "0",
+    salAmount: employee?.salAmount ?? "0",
+    gradeAmount: employee?.gradeAmount ?? "0",
+    commandNo: employee?.commandNo ?? "",
+    commandDescription: employee?.commandDescription ?? "",
+    etaxCode: employee?.etaxCode ?? "",
   });
 
   function set<K extends keyof EmployeeInput>(key: K, value: EmployeeInput[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  function toggleTag(id: string) {
-    setForm((prev) => ({
-      ...prev,
-      tagIds: prev.tagIds?.includes(id)
-        ? prev.tagIds.filter((t) => t !== id)
-        : [...(prev.tagIds ?? []), id],
-    }));
-  }
-
-  function handleJobPositionChange(value: string | null) {
-    const selected = formOptions.jobPositions.find((job) => job.id === value);
-    setForm((prev) => ({
-      ...prev,
-      jobPositionId: value,
-      jobTitle: selected?.name ?? (value ? prev.jobTitle : ""),
-    }));
-  }
-
-  function onPickAvatar(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => set("avatarUrl", reader.result as string);
-    reader.readAsDataURL(file);
-  }
-
-  function handleSave() {
-    if (!form.name.trim()) {
-      toast.error("Ажилчны нэр шаардлагатай");
+  function save() {
+    if (!form.name?.trim()) {
+      toast.error("Нэр оруулах шаардлагатай");
       return;
     }
     startTransition(async () => {
       try {
         if (employee) {
           await updateEmployee(employee.id, form);
-          toast.success("Employee updated");
+          toast.success("Ажилтны мэдээлэл шинэчлэгдлээ");
           router.push(`/employees/${employee.id}`);
         } else {
           const id = await createEmployee(form);
-          toast.success("Employee created");
+          toast.success("Ажилтан бүртгэгдлээ");
           router.push(`/employees/${id}`);
         }
         router.refresh();
-      } catch (err) {
-        toast.error(
-          err instanceof Error ? err.message : "Something went wrong"
-        );
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Алдаа гарлаа");
       }
     });
   }
 
   return (
     <div className="flex flex-col">
-      <div className="flex flex-wrap items-center gap-3 border-b border-border/70 bg-control-bar/95 px-4 py-3">
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={isPending}
-            className="flex items-center gap-1.5 rounded-lg bg-accent-foreground px-3.5 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50"
-          >
-            <Check className="size-4" /> Хадгалах
-          </button>
-          <button
-            type="button"
-            onClick={() =>
-              router.push(employee ? `/employees/${employee.id}` : "/employees")
-            }
-            className="flex items-center gap-1.5 rounded-lg border border-border bg-background/80 px-3.5 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent"
-          >
-            <X className="size-4" /> Цуцлах
-          </button>
-          <span className="ml-1 flex flex-col leading-tight">
-            <span className="text-[13px] font-medium text-brand-teal">
-              Ажилчид
-            </span>
-            <span className="text-xs text-muted-foreground">
-              {employee ? employee.name : "Шинээр элсэх"}
-            </span>
-          </span>
-        </div>
-
-        <div className="ml-auto flex flex-wrap gap-2">
-          {smartButtons.map((btn) => {
-            const Icon = btn.icon;
-            const value =
-              btn.valueKey === "monthlyHours"
-                ? `${form.monthlyHours ?? 0}h`
-                : btn.value;
-            return (
-              <div
-                key={btn.label}
-                className="flex items-center gap-2 rounded-xl border border-border bg-background/55 px-3 py-2 shadow-sm"
-              >
-                <Icon className="size-4 text-brand-teal" />
-                <div className="flex flex-col leading-tight">
-                  <span className="text-xs font-medium">{btn.label}</span>
-                  {value ? (
-                    <span className="text-xs text-muted-foreground">
-                      {value}
-                    </span>
-                  ) : null}
-                </div>
-              </div>
-            );
-          })}
+      <div className="flex flex-wrap items-center gap-2 border-b bg-control-bar px-4 py-3">
+        <button
+          type="button"
+          onClick={save}
+          disabled={isPending}
+          className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
+        >
+          <Check className="size-4" /> Хадгалах
+        </button>
+        <button
+          type="button"
+          onClick={() =>
+            router.push(employee ? `/employees/${employee.id}` : "/employees")
+          }
+          className="inline-flex items-center gap-1.5 rounded-md border bg-background px-3 py-2 text-sm text-muted-foreground hover:bg-accent"
+        >
+          <X className="size-4" /> Цуцлах
+        </button>
+        <div className="ml-2 leading-tight">
+          <div className="text-sm font-semibold">Ажилтан</div>
+          <div className="text-xs text-muted-foreground">
+            {employee ? employee.name : "Шинэ бүртгэл"}
+          </div>
         </div>
       </div>
 
-      <div className="mx-auto w-full max-w-5xl px-4 py-6">
-        <button
-          type="button"
-          className="mb-6 rounded-lg bg-accent-foreground/80 px-3.5 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-opacity hover:opacity-90"
-          onClick={() =>
-            toast.info("User account creation is a placeholder in this demo")
-          }
-        >
-          Хэрэглэгч нээх
-        </button>
-
-        <div className="flex flex-col gap-6 md:flex-row">
-          <div className="shrink-0">
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/*"
-              hidden
-              onChange={onPickAvatar}
-            />
-            <button
-              type="button"
-              onClick={() => fileRef.current?.click()}
-              className="flex size-36 items-center justify-center overflow-hidden rounded-2xl border border-border bg-muted text-muted-foreground shadow-sm transition-colors hover:bg-accent"
-              aria-label="Upload photo"
-            >
-              {form.avatarUrl ? (
-                <img
-                  src={form.avatarUrl}
-                  alt=""
-                  className="size-full object-cover"
+      <div className="mx-auto w-full max-w-6xl px-4 py-5">
+        <div className="grid gap-5 md:grid-cols-[160px_1fr]">
+          <div className="flex flex-col gap-2">
+            <div className="flex size-32 items-center justify-center overflow-hidden rounded-md border bg-muted text-3xl font-semibold text-muted-foreground">
+              {form.photoUrl ? (
+                <span
+                  aria-hidden
+                  className="size-full bg-cover bg-center"
+                  style={{ backgroundImage: `url(${String(form.photoUrl)})` }}
                 />
               ) : (
-                <ImagePlus className="size-10" />
+                initials(form.surname, form.name)
               )}
-            </button>
+            </div>
+            <FieldText
+              label="Зураг URL"
+              value={form.photoUrl ?? ""}
+              onChange={(value) => set("photoUrl", value)}
+            />
           </div>
 
-          <div className="flex-1">
-            <input
-              value={form.name}
-              onChange={(e) => set("name", e.target.value)}
-              placeholder="Овог нэр оруулна уу."
-              className="w-full rounded-xl bg-background/35 px-3 py-2 text-3xl font-semibold text-foreground outline-none placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-brand-purple/15"
-            />
-            <div className="mt-4 flex flex-col gap-2.5">
-              <HeaderField icon={Mail}>
-                <input
-                  value={form.workEmail}
-                  onChange={(e) => set("workEmail", e.target.value)}
-                  placeholder="имейл@example.com"
-                  className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground/70"
-                />
-              </HeaderField>
-              <HeaderField icon={Phone}>
-                <input
-                  value={form.workPhone}
-                  onChange={(e) => set("workPhone", e.target.value)}
-                  placeholder="Ажлын утас"
-                  className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground/70"
-                />
-              </HeaderField>
-              <HeaderField icon={Smartphone}>
-                <input
-                  value={form.workMobile}
-                  onChange={(e) => set("workMobile", e.target.value)}
-                  placeholder="Дугаар"
-                  className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground/70"
-                />
-              </HeaderField>
-              <HeaderField icon={TagIcon}>
-                <div className="flex flex-wrap gap-1.5">
-                  {formOptions.tags.map((tag) => {
-                    const active = form.tagIds?.includes(tag.id);
-                    return (
-                      <button
-                        type="button"
-                        key={tag.id}
-                        onClick={() => toggleTag(tag.id)}
-                        className={cn(
-                          "rounded-full px-2.5 py-1 text-xs transition-colors",
-                          active
-                            ? ""
-                            : "border border-dashed border-border bg-background/45 text-muted-foreground hover:bg-accent"
-                        )}
-                        style={
-                          active
-                            ? {
-                                backgroundColor: `${tag.color ?? "#888"}33`,
-                                color: tag.color ?? undefined,
-                              }
-                            : undefined
-                        }
-                      >
-                        {tag.name}
-                      </button>
-                    );
-                  })}
-                  {formOptions.tags.length === 0 && (
-                    <span className="text-sm text-muted-foreground">
-                      Үүсгэн байгуулагч, CEO гэх мэт...
-                    </span>
-                  )}
-                </div>
-              </HeaderField>
+          <div>
+            <div className="grid gap-3 md:grid-cols-2">
+              <FieldText
+                label="Овог"
+                value={form.surname ?? ""}
+                onChange={(value) => set("surname", value)}
+              />
+              <FieldText
+                label="Нэр"
+                value={form.name ?? ""}
+                onChange={(value) => set("name", value)}
+                required
+              />
+              <FieldText
+                label="Ургийн овог"
+                value={form.urgiinOvog ?? ""}
+                onChange={(value) => set("urgiinOvog", value)}
+              />
+              <FieldText
+                label="Ажилтны код"
+                value={form.empno ?? ""}
+                onChange={(value) => set("empno", value)}
+              />
+              <FieldText
+                label="Регистр"
+                value={form.registerno ?? ""}
+                onChange={(value) => set("registerno", value)}
+              />
+              <FieldSelect
+                label="Төлөв"
+                value={form.status ?? "active"}
+                options={[
+                  { id: "active", name: "active" },
+                  { id: "inactive", name: "inactive" },
+                  { id: "fired", name: "fired" },
+                ]}
+                onChange={(value) => set("status", value ?? "active")}
+              />
             </div>
           </div>
         </div>
 
-        <Tabs defaultValue="work" className="mt-8">
-          <TabsList className="w-full justify-start gap-1 rounded-none border-b border-border bg-transparent p-0">
-            {["work", "resume", "personal", "payroll", "settings"].map(
-              (tab) => (
-                <TabsTrigger
-                  key={tab}
-                  value={tab}
-                  className="rounded-t-lg border-b-2 border-transparent px-4 py-2 capitalize text-muted-foreground data-[state=active]:border-brand-purple data-[state=active]:bg-brand-purple/10 data-[state=active]:text-brand-purple data-[state=active]:shadow-none"
-                >
-                  {tab}
-                </TabsTrigger>
-              )
-            )}
+        <Tabs defaultValue="work" className="mt-6">
+          <TabsList className="flex h-auto flex-wrap justify-start rounded-md border bg-muted/35 p-1">
+            <TabsTrigger value="work">Ажил</TabsTrigger>
+            <TabsTrigger value="personal">Хувийн</TabsTrigger>
+            <TabsTrigger value="payroll">Цалин</TabsTrigger>
+            <TabsTrigger value="documents">Баримт</TabsTrigger>
+            <TabsTrigger value="system">Систем</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="work" className="pt-6">
-            <div className="grid gap-10 md:grid-cols-2">
-              <div className="flex flex-col gap-4">
-                <SectionTitle>Албан тушаалын мэдээлэл</SectionTitle>
-                <FieldSelect
-                  label="Хэлтэс"
-                  value={form.departmentId}
-                  options={formOptions.departments}
-                  onChange={(v) => set("departmentId", v)}
-                />
-                <FieldSelect
-                  label="Албан Тушаал"
-                  value={form.jobPositionId}
-                  options={formOptions.jobPositions}
-                  onChange={handleJobPositionChange}
-                />
-                <FieldText
-                  label="Үүрэг"
-                  value={form.jobTitle ?? ""}
-                  placeholder="албан тушаалын тайлбар"
-                  onChange={(v) => set("jobTitle", v)}
-                />
-                <FieldSelect
-                  label="Удирдах албан тушаалтан"
-                  value={form.managerId}
-                  options={formOptions.managers.filter(
-                    (m) => m.id !== employee?.id
-                  )}
-                  onChange={(v) => set("managerId", v)}
-                />
-                <FieldSelect
-                  label="Ажлын байрны байршил"
-                  value={form.workLocationId}
-                  options={formOptions.workLocations}
-                  onChange={(v) => set("workLocationId", v)}
-                />
-                <FieldText
-                  label="Ажил олгогч"
-                  value={form.company ?? ""}
-                  onChange={(v) => set("company", v)}
-                />
-              </div>
-              <div className="flex flex-col gap-3">
-                <SectionTitle>Organization Chart</SectionTitle>
-                <p className="text-sm italic text-muted-foreground">
-                  Менежер эсвэл холбогдох удирах албан тушаалтан.
-                </p>
-                <div className="rounded-md border border-dashed border-border p-4 text-sm text-muted-foreground">
-                  {form.managerId
-                    ? `Reports to ${
-                        formOptions.managers.find(
-                          (m) => m.id === form.managerId
-                        )?.name ?? "selected manager"
-                      }`
-                    : "Холбогдох албан тушаалтан байхгүй байна."}
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="resume" className="pt-6">
-            <SectionTitle>Resume</SectionTitle>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Add experience, education and skills. Detailed resume lines can be
-              added once the employee record is saved.
-            </p>
-          </TabsContent>
-
-          <TabsContent value="personal" className="pt-6">
-            <div className="grid gap-10 md:grid-cols-2">
-              <div className="flex flex-col gap-4">
-                <SectionTitle>Private Contact</SectionTitle>
-                <FieldText
-                  label="Private Email"
-                  value={form.privateEmail ?? ""}
-                  onChange={(v) => set("privateEmail", v)}
-                />
-                <FieldText
-                  label="Private Phone"
-                  value={form.privatePhone ?? ""}
-                  onChange={(v) => set("privatePhone", v)}
-                />
-                <div className="grid grid-cols-[140px_1fr] items-start gap-3">
-                  <Label className="pt-2 text-sm font-medium">Address</Label>
-                  <Textarea
-                    value={form.privateAddress ?? ""}
-                    onChange={(e) => set("privateAddress", e.target.value)}
-                    rows={3}
-                  />
-                </div>
-              </div>
-              <div className="flex flex-col gap-4">
-                <SectionTitle>Citizenship</SectionTitle>
-                <FieldSelectStatic
-                  label="Gender"
-                  value={form.gender ?? ""}
-                  onChange={(v) => set("gender", v as EmployeeInput["gender"])}
-                  options={[
-                    { id: "male", name: "Male" },
-                    { id: "female", name: "Female" },
-                    { id: "other", name: "Other" },
-                  ]}
-                />
-                <div className="grid grid-cols-1 items-center gap-2 sm:grid-cols-[140px_1fr] sm:gap-3">
-                  <Label className="text-sm font-medium text-foreground/105">
-                    Date of Birth
-                  </Label>
-                  <input
-                    type="date"
-                    value={form.dateOfBirth ?? ""}
-                    onChange={(e) => set("dateOfBirth", e.target.value)}
-                    className="soft-input"
-                  />
-                </div>
-                <FieldText
-                  label="Nationality"
-                  value={form.nationality ?? ""}
-                  onChange={(v) => set("nationality", v)}
-                />
-                <FieldSelectStatic
-                  label="Marital Status"
-                  value={form.maritalStatus ?? ""}
-                  onChange={(v) =>
-                    set("maritalStatus", v as EmployeeInput["maritalStatus"])
-                  }
-                  options={[
-                    { id: "single", name: "Single" },
-                    { id: "married", name: "Married" },
-                    { id: "cohabitant", name: "Legal Cohabitant" },
-                    { id: "widower", name: "Widower" },
-                    { id: "divorced", name: "Divorced" },
-                  ]}
-                />
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="payroll" className="pt-6">
-            <div className="grid max-w-md gap-4">
-              <SectionTitle>Contract</SectionTitle>
+          <TabsContent value="work" className="mt-5">
+            <Section title="Ажлын мэдээлэл">
               <FieldSelect
-                label="Employee Type"
-                value={form.employeeTypeId}
-                options={formOptions.employeeTypes}
-                onChange={(v) => set("employeeTypeId", v)}
+                label="Хэлтэс"
+                value={form.depIdent}
+                options={options.departments ?? []}
+                onChange={(value) => set("depIdent", value)}
               />
-              <div className="grid grid-cols-1 items-center gap-2 sm:grid-cols-[140px_1fr] sm:gap-3">
-                <Label className="text-sm font-medium text-foreground/105">
-                  Monthly Hours
-                </Label>
-                <input
-                  type="number"
-                  value={form.monthlyHours ?? 0}
-                  onChange={(e) => set("monthlyHours", Number(e.target.value))}
-                  className="soft-input"
-                />
-              </div>
-            </div>
+              <FieldSelect
+                label="Албан тушаал"
+                value={form.occupationIdent}
+                options={options.occupations ?? []}
+                onChange={(value) => set("occupationIdent", value)}
+              />
+              <FieldText
+                label="Албан нэр"
+                value={form.post ?? ""}
+                onChange={(value) => set("post", value)}
+              />
+              <FieldSelect
+                label="2 дахь албан тушаал"
+                value={form.occupationIdent2}
+                options={options.occupations ?? []}
+                onChange={(value) => set("occupationIdent2", value)}
+              />
+              <FieldSelect
+                label="Салбар"
+                value={form.branchIdent}
+                options={options.branches ?? []}
+                onChange={(value) => set("branchIdent", value)}
+              />
+              <FieldSelect
+                label="Оффис"
+                value={form.officeIdent}
+                options={options.offices ?? []}
+                onChange={(value) => set("officeIdent", value)}
+              />
+              <FieldSelect
+                label="Ээлж"
+                value={form.schedule}
+                options={options.shifts ?? []}
+                onChange={(value) => set("schedule", value)}
+              />
+              <FieldSelect
+                label="Ур чадвар"
+                value={form.wskillIdent}
+                options={options.workSkills ?? []}
+                onChange={(value) => set("wskillIdent", value)}
+              />
+              <FieldText
+                label="Ажлын төрөл"
+                value={form.jobType ?? ""}
+                onChange={(value) => set("jobType", value)}
+              />
+              <FieldText
+                label="Job figure"
+                value={form.jobFigure ?? ""}
+                onChange={(value) => set("jobFigure", value)}
+              />
+              <FieldDate
+                label="Ажилд орсон"
+                value={form.inworkdate ?? ""}
+                onChange={(value) => set("inworkdate", value)}
+              />
+              <FieldDate
+                label="Эхлэх огноо"
+                value={form.gDate ?? ""}
+                onChange={(value) => set("gDate", value)}
+              />
+              <FieldDate
+                label="Дуусах огноо"
+                value={form.gEnddate ?? ""}
+                onChange={(value) => set("gEnddate", value)}
+              />
+            </Section>
           </TabsContent>
 
-          <TabsContent value="settings" className="pt-6">
-            <div className="grid max-w-md gap-4">
-              <SectionTitle>Status</SectionTitle>
-              <FieldSelectStatic
-                label="Kanban State"
-                value={form.kanbanState ?? "normal"}
-                onChange={(v) =>
-                  set("kanbanState", v as EmployeeInput["kanbanState"])
-                }
-                options={[
-                  { id: "normal", name: "In Progress (grey)" },
-                  { id: "done", name: "Ready (green)" },
-                  { id: "blocked", name: "Blocked (red)" },
-                ]}
+          <TabsContent value="personal" className="mt-5">
+            <Section title="Хувийн мэдээлэл">
+              <FieldText
+                label="Имэйл"
+                value={form.email ?? ""}
+                onChange={(value) => set("email", value)}
               />
-            </div>
+              <FieldText
+                label="Ажлын утас"
+                value={form.workphone ?? ""}
+                onChange={(value) => set("workphone", value)}
+              />
+              <FieldText
+                label="Гэрийн утас"
+                value={form.homephone ?? ""}
+                onChange={(value) => set("homephone", value)}
+              />
+              <FieldText
+                label="Нэмэлт утас"
+                value={form.phone2 ?? ""}
+                onChange={(value) => set("phone2", value)}
+              />
+              <FieldSelect
+                label="Хүйс"
+                value={form.gender ?? null}
+                options={[
+                  { id: "M", name: "Эрэгтэй" },
+                  { id: "F", name: "Эмэгтэй" },
+                ]}
+                onChange={(value) => set("gender", value ?? "")}
+              />
+              <FieldDate
+                label="Төрсөн огноо"
+                value={form.birthday ?? ""}
+                onChange={(value) => set("birthday", value)}
+              />
+              <FieldSelect
+                label="Үндэс угсаа"
+                value={form.nationalityIdent}
+                options={options.nationalities ?? []}
+                onChange={(value) => set("nationalityIdent", value)}
+              />
+              <FieldSelect
+                label="Улс"
+                value={form.countryIdent}
+                options={options.countries ?? []}
+                onChange={(value) => set("countryIdent", value)}
+              />
+              <FieldSelect
+                label="Гэрлэлтийн төлөв"
+                value={form.maritalstatusIdent}
+                options={options.maritalStatuses ?? []}
+                onChange={(value) => set("maritalstatusIdent", value)}
+              />
+              <FieldSelect
+                label="Орон сууц"
+                value={form.apartcondIdent}
+                options={options.apartmentConds ?? []}
+                onChange={(value) => set("apartcondIdent", value)}
+              />
+              <FieldSelect
+                label="Машин эзэмшил"
+                value={form.carowncondIdent}
+                options={options.carownConds ?? []}
+                onChange={(value) => set("carowncondIdent", value)}
+              />
+              <FieldText
+                label="Цусны бүлэг"
+                value={form.bloodType ?? ""}
+                onChange={(value) => set("bloodType", value)}
+              />
+            </Section>
+          </TabsContent>
+
+          <TabsContent value="payroll" className="mt-5">
+            <Section title="Цалин болон банк">
+              <FieldText
+                label="Үндсэн цалин"
+                value={form.salary ?? "0"}
+                onChange={(value) => set("salary", value)}
+              />
+              <FieldSelect
+                label="Банк"
+                value={form.bankIdent}
+                options={options.banks ?? []}
+                onChange={(value) => set("bankIdent", value)}
+              />
+              <FieldText
+                label="IBAN/данс"
+                value={form.ibankNumber ?? ""}
+                onChange={(value) => set("ibankNumber", value)}
+              />
+              <FieldSelect
+                label="Даатгал"
+                value={form.insurIdent}
+                options={options.insuranceTypes ?? []}
+                onChange={(value) => set("insurIdent", value)}
+              />
+              <FieldNumber
+                label="Ажилласан жил"
+                value={form.workingYear ?? 0}
+                onChange={(value) => set("workingYear", value)}
+              />
+              <FieldNumber
+                label="Салбарын жил"
+                value={form.workyearSector ?? 0}
+                onChange={(value) => set("workyearSector", value)}
+              />
+              <FieldText
+                label="Зэрэг"
+                value={form.grade ?? ""}
+                onChange={(value) => set("grade", value)}
+              />
+              <FieldText
+                label="Зэрэглэл"
+                value={form.gradeLevel ?? ""}
+                onChange={(value) => set("gradeLevel", value)}
+              />
+              <FieldText
+                label="Зэрэг %"
+                value={form.gradePerc ?? "0"}
+                onChange={(value) => set("gradePerc", value)}
+              />
+              <FieldText
+                label="Нэмэгдэл %"
+                value={form.salPercent ?? "0"}
+                onChange={(value) => set("salPercent", value)}
+              />
+              <FieldText
+                label="Нэмэгдэл дүн"
+                value={form.salAmount ?? "0"}
+                onChange={(value) => set("salAmount", value)}
+              />
+              <FieldText
+                label="Grade amount"
+                value={form.gradeAmount ?? "0"}
+                onChange={(value) => set("gradeAmount", value)}
+              />
+            </Section>
+          </TabsContent>
+
+          <TabsContent value="documents" className="mt-5">
+            <Section title="Боловсрол, бичиг баримт">
+              <FieldSelect
+                label="Боловсрол"
+                value={form.educationIdent}
+                options={options.educations ?? []}
+                onChange={(value) => set("educationIdent", value)}
+              />
+              <FieldSelect
+                label="Төгссөн"
+                value={form.graduateIdent}
+                options={options.graduates ?? []}
+                onChange={(value) => set("graduateIdent", value)}
+              />
+              <FieldSelect
+                label="Зэрэг"
+                value={form.degreeIdent}
+                options={options.degrees ?? []}
+                onChange={(value) => set("degreeIdent", value)}
+              />
+              <FieldText
+                label="Паспорт"
+                value={form.passport ?? ""}
+                onChange={(value) => set("passport", value)}
+              />
+              <FieldText
+                label="НД дугаар"
+                value={form.ndno ?? ""}
+                onChange={(value) => set("ndno", value)}
+              />
+              <FieldText
+                label="ЭМД дугаар"
+                value={form.emdno ?? ""}
+                onChange={(value) => set("emdno", value)}
+              />
+              <FieldSelect
+                label="Хувцас"
+                value={form.clothessizeIdent}
+                options={options.clothesSizes ?? []}
+                onChange={(value) => set("clothessizeIdent", value)}
+              />
+              <FieldSelect
+                label="Гутал"
+                value={form.shoessizeIdent}
+                options={options.clothesSizes ?? []}
+                onChange={(value) => set("shoessizeIdent", value)}
+              />
+              <FieldText
+                label="eTax код"
+                value={form.etaxCode ?? ""}
+                onChange={(value) => set("etaxCode", value)}
+              />
+            </Section>
+          </TabsContent>
+
+          <TabsContent value="system" className="mt-5">
+            <Section title="Системийн талбарууд">
+              <FieldSelect
+                label="Гэрээт ажилтан"
+                value={form.contractEmp ?? "no"}
+                options={[
+                  { id: "no", name: "no" },
+                  { id: "yes", name: "yes" },
+                ]}
+                onChange={(value) => set("contractEmp", value ?? "no")}
+              />
+              <FieldSelect
+                label="Менежер туршлага"
+                value={form.managerExp ?? "no"}
+                options={[
+                  { id: "no", name: "no" },
+                  { id: "yes", name: "yes" },
+                ]}
+                onChange={(value) => set("managerExp", value ?? "no")}
+              />
+              <FieldSelect
+                label="Гарсан шалтгаан"
+                value={form.firedreasonIdent}
+                options={options.firedReasons ?? []}
+                onChange={(value) => set("firedreasonIdent", value)}
+              />
+              <FieldText
+                label="Тушаал №"
+                value={form.commandNo ?? ""}
+                onChange={(value) => set("commandNo", value)}
+              />
+              <div className="grid gap-2 sm:col-span-2">
+                <Label>Тушаалын тайлбар</Label>
+                <Textarea
+                  value={form.commandDescription ?? ""}
+                  onChange={(event) =>
+                    set("commandDescription", event.target.value)
+                  }
+                  rows={3}
+                />
+              </div>
+            </Section>
           </TabsContent>
         </Tabs>
       </div>
@@ -519,50 +547,101 @@ export function EmployeeForm({ options, employee }: EmployeeFormProps) {
   );
 }
 
-function HeaderField({
-  icon: Icon,
-  children,
-}: {
-  icon: typeof Mail;
-  children: React.ReactNode;
-}) {
+function initials(surname?: string, name?: string) {
   return (
-    <div className="flex items-center gap-2">
-      <Icon className="size-4 shrink-0 text-muted-foreground" />
-      <div className="min-w-0 flex-1">{children}</div>
-    </div>
+    [surname, name]
+      .filter(Boolean)
+      .map((part) => part?.[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() || "HR"
   );
 }
 
-function SectionTitle({ children }: { children: React.ReactNode }) {
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
-    <h2 className="border-b border-border pb-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-      {children}
-    </h2>
+    <div className="rounded-md border bg-card p-4">
+      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        {title}
+      </h2>
+      <div className="grid gap-4 md:grid-cols-2">{children}</div>
+    </div>
   );
 }
 
 function FieldText({
   label,
   value,
-  placeholder,
+  onChange,
+  required,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  required?: boolean;
+}) {
+  return (
+    <label className="grid gap-1.5 text-sm">
+      <span className="font-medium">
+        {label}
+        {required ? <span className="text-destructive"> *</span> : null}
+      </span>
+      <input
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="soft-input"
+      />
+    </label>
+  );
+}
+
+function FieldNumber({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  onChange: (value: number) => void;
+}) {
+  return (
+    <label className="grid gap-1.5 text-sm">
+      <span className="font-medium">{label}</span>
+      <input
+        type="number"
+        value={value}
+        onChange={(event) => onChange(Number(event.target.value))}
+        className="soft-input"
+      />
+    </label>
+  );
+}
+
+function FieldDate({
+  label,
+  value,
   onChange,
 }: {
   label: string;
   value: string;
-  placeholder?: string;
-  onChange: (v: string) => void;
+  onChange: (value: string) => void;
 }) {
   return (
-    <div className="grid grid-cols-1 items-center gap-2 sm:grid-cols-[140px_1fr] sm:gap-3">
-      <Label className="text-sm font-medium text-foreground/105">{label}</Label>
+    <label className="grid gap-1.5 text-sm">
+      <span className="font-medium">{label}</span>
       <input
+        type="date"
         value={value}
-        placeholder={placeholder}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(event) => onChange(event.target.value)}
         className="soft-input"
       />
-    </div>
+    </label>
   );
 }
 
@@ -575,57 +654,23 @@ function FieldSelect({
   label: string;
   value: string | null | undefined;
   options: Option[];
-  onChange: (v: string | null) => void;
+  onChange: (value: string | null) => void;
 }) {
   return (
-    <div className="grid grid-cols-1 items-center gap-2 sm:grid-cols-[140px_1fr] sm:gap-3">
-      <Label className="text-sm font-medium text-foreground/105">{label}</Label>
+    <div className="grid gap-1.5 text-sm">
+      <Label className="font-medium">{label}</Label>
       <Select
         value={value ?? "__none"}
-        onValueChange={(v) => onChange(v === "__none" ? null : v)}
+        onValueChange={(next) => onChange(next === "__none" ? null : next)}
       >
-        <SelectTrigger className="w-full bg-background/70">
-          <SelectValue placeholder="Select..." />
+        <SelectTrigger className="w-full bg-background">
+          <SelectValue placeholder="Сонгох" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="__none">—</SelectItem>
-          {options.map((o) => (
-            <SelectItem key={o.id} value={o.id}>
-              {o.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
-  );
-}
-
-function FieldSelectStatic({
-  label,
-  value,
-  options,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  options: Option[];
-  onChange: (v: string) => void;
-}) {
-  return (
-    <div className="grid grid-cols-1 items-center gap-2 sm:grid-cols-[140px_1fr] sm:gap-3">
-      <Label className="text-sm font-medium text-foreground/105">{label}</Label>
-      <Select
-        value={value || "__none"}
-        onValueChange={(v) => onChange(v === "__none" || v == null ? "" : v)}
-      >
-        <SelectTrigger className="w-full bg-background/70">
-          <SelectValue placeholder="Select..." />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="__none">—</SelectItem>
-          {options.map((o) => (
-            <SelectItem key={o.id} value={o.id}>
-              {o.name}
+          {options.map((option) => (
+            <SelectItem key={option.id} value={option.id}>
+              {option.name}
             </SelectItem>
           ))}
         </SelectContent>

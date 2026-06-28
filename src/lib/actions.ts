@@ -2,10 +2,70 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db/prisma";
-import type { ConfigModel, Employee } from "@/lib/types";
+import { CONFIG_DEFS } from "@/lib/config-defs";
 
 export interface EmployeeInput {
   name: string;
+  surname?: string;
+  ovog?: string;
+  urgiinOvog?: string;
+  empno?: string;
+  registerno?: string;
+  gender?: string;
+  birthday?: string;
+  email?: string;
+  workphone?: string;
+  homephone?: string;
+  phone2?: string;
+  post?: string;
+  status?: string;
+  photoUrl?: string | null;
+  depIdent?: string | null;
+  occupationIdent?: string | null;
+  occupationIdent2?: string | null;
+  educationIdent?: string | null;
+  graduateIdent?: string | null;
+  wskillIdent?: string | null;
+  branchIdent?: string | null;
+  bankIdent?: string | null;
+  schedule?: string | null;
+  officeIdent?: string | null;
+  nationalityIdent?: string | null;
+  countryIdent?: string | null;
+  maritalstatusIdent?: string | null;
+  apartcondIdent?: string | null;
+  carowncondIdent?: string | null;
+  degreeIdent?: string | null;
+  insurIdent?: string | null;
+  firedreasonIdent?: string | null;
+  clothessizeIdent?: string | null;
+  shoessizeIdent?: string | null;
+  salary?: string;
+  workingYear?: number;
+  workyearSector?: number;
+  inworkdate?: string;
+  gDate?: string;
+  gEnddate?: string;
+  managerExp?: string;
+  contractEmp?: string;
+  jobType?: string;
+  jobFigure?: string;
+  passport?: string;
+  ndno?: string;
+  emdno?: string;
+  ibankNumber?: string;
+  bloodType?: string;
+  grade?: string;
+  gradeLevel?: string;
+  gradePerc?: string;
+  perc1?: string;
+  perc2?: string;
+  salPercent?: string;
+  salAmount?: string;
+  gradeAmount?: string;
+  commandNo?: string;
+  commandDescription?: string;
+  etaxCode?: string;
   workEmail?: string;
   workPhone?: string;
   workMobile?: string;
@@ -21,309 +81,314 @@ export interface EmployeeInput {
   privateEmail?: string;
   privatePhone?: string;
   privateAddress?: string;
-  gender?: Employee["gender"];
   dateOfBirth?: string;
-  nationality?: string;
-  maritalStatus?: Employee["maritalStatus"];
   monthlyHours?: number;
-  kanbanState?: Employee["kanbanState"];
+  kanbanState?: string;
 }
 
-function emptyToNull(value?: string | null) {
-  return value && value.trim() ? value : null;
+function trimmed(value?: string | null, max?: number): string | null {
+  const clean = value == null ? "" : String(value).trim();
+  if (!clean) return null;
+  return max ? clean.slice(0, max) : clean;
 }
 
-function parseDate(value?: string) {
+function requiredText(value: unknown, label: string, max?: number): string {
+  const clean = String(value ?? "").trim();
+  if (!clean) throw new Error(`${label} шаардлагатай`);
+  return max ? clean.slice(0, max) : clean;
+}
+
+function nullableInt(value?: string | null): number | null {
+  if (value == null || value === "") return null;
+  const parsed = Number(value);
+  return Number.isInteger(parsed) ? parsed : null;
+}
+
+function requiredInt(value: unknown, label: string): number {
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed)) throw new Error(`${label} зөв тоо байх ёстой`);
+  return parsed;
+}
+
+function optionalNumber(value: unknown): number | undefined {
+  if (value == null || value === "") return undefined;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
+function date(value?: string | null): Date | null {
   if (!value) return null;
-  const date = new Date(`${value}T00:00:00.000Z`);
-  return Number.isNaN(date.getTime()) ? null : date;
+  const parsed = new Date(`${value}T00:00:00.000Z`);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
-function uniqueIds(ids?: string[]) {
-  return [...new Set((ids ?? []).filter(Boolean))];
+function money(value?: string | null): string | undefined {
+  if (value == null || value === "") return undefined;
+  const parsed = Number(String(value).replace(/,/g, ""));
+  return Number.isFinite(parsed) ? String(parsed) : undefined;
 }
 
-function locationType(value: unknown): "office" | "home" | "other" {
-  return value === "home" || value === "other" ? value : "office";
-}
-
-function normalize(input: EmployeeInput) {
+function employeeData(input: EmployeeInput) {
+  const name = requiredText(input.name, "Нэр", 25);
+  const surname = trimmed(input.surname, 25);
+  const fullname = [surname, name].filter(Boolean).join(" ");
   return {
-    name: input.name.trim(),
-    workEmail: input.workEmail?.trim() ?? "",
-    workPhone: input.workPhone?.trim() ?? "",
-    workMobile: input.workMobile?.trim() ?? "",
-    avatarUrl: input.avatarUrl ?? null,
-    jobPositionId: emptyToNull(input.jobPositionId),
-    jobTitle: input.jobTitle?.trim() ?? "",
-    departmentId: emptyToNull(input.departmentId),
-    managerId: emptyToNull(input.managerId),
-    employeeTypeId: emptyToNull(input.employeeTypeId),
-    workLocationId: emptyToNull(input.workLocationId),
-    company: input.company?.trim() ?? "",
-    privateEmail: input.privateEmail?.trim() ?? "",
-    privatePhone: input.privatePhone?.trim() ?? "",
-    privateAddress: input.privateAddress?.trim() ?? "",
-    gender: input.gender || null,
-    dateOfBirth: parseDate(input.dateOfBirth),
-    nationality: input.nationality?.trim() ?? "",
-    maritalStatus: input.maritalStatus || null,
-    monthlyHours: input.monthlyHours ?? 0,
-    kanbanState: input.kanbanState ?? "normal",
+    name,
+    surname,
+    fullname: fullname || name,
+    ovog: trimmed(input.ovog, 25),
+    urgiin_ovog: trimmed(input.urgiinOvog, 100),
+    empno: trimmed(input.empno, 10),
+    registerno: trimmed(input.registerno, 20),
+    gender: trimmed(input.gender, 1),
+    birthday: date(input.birthday ?? input.dateOfBirth),
+    email: trimmed(input.email ?? input.workEmail, 50),
+    workphone: trimmed(input.workphone ?? input.workPhone, 14),
+    homephone: trimmed(input.homephone ?? input.privatePhone, 14),
+    phone2: trimmed(input.phone2 ?? input.workMobile, 14),
+    post: trimmed(input.post ?? input.jobTitle, 25),
+    status: trimmed(input.status, 8) ?? "active",
+    photo_url: trimmed(input.photoUrl ?? input.avatarUrl, 300),
+    dep_ident: nullableInt(input.depIdent ?? input.departmentId),
+    occupation_ident: nullableInt(input.occupationIdent ?? input.jobPositionId),
+    occupation_ident2: nullableInt(input.occupationIdent2),
+    education_ident: nullableInt(input.educationIdent),
+    graduate_ident: nullableInt(input.graduateIdent),
+    wskill_ident: nullableInt(input.wskillIdent),
+    branch_ident: nullableInt(input.branchIdent),
+    bank_ident: nullableInt(input.bankIdent),
+    schedule: nullableInt(input.schedule),
+    office_ident: nullableInt(input.officeIdent ?? input.workLocationId),
+    nationality_ident: nullableInt(input.nationalityIdent),
+    country_ident: nullableInt(input.countryIdent),
+    maritalstatus_ident: nullableInt(input.maritalstatusIdent),
+    apartcond_ident: nullableInt(input.apartcondIdent),
+    carowncond_ident: nullableInt(input.carowncondIdent),
+    degree_ident: nullableInt(input.degreeIdent),
+    insur_ident: nullableInt(input.insurIdent),
+    firedreason_ident: nullableInt(input.firedreasonIdent),
+    clothessize_ident: nullableInt(input.clothessizeIdent),
+    shoessize_ident: nullableInt(input.shoessizeIdent),
+    salary: money(input.salary) ?? "0",
+    working_year: input.workingYear ?? 0,
+    workyear_sector: input.workyearSector ?? 0,
+    inworkdate: date(input.inworkdate),
+    g_date: date(input.gDate),
+    g_enddate: date(input.gEnddate),
+    manager_exp: trimmed(input.managerExp, 12) ?? "no",
+    contract_emp: trimmed(input.contractEmp, 12) ?? "no",
+    job_type: trimmed(input.jobType, 20),
+    job_figure: trimmed(input.jobFigure, 20) ?? "Main",
+    passport: trimmed(input.passport, 14),
+    ndno: trimmed(input.ndno, 14),
+    emdno: trimmed(input.emdno, 14),
+    ibank_number: trimmed(input.ibankNumber, 20),
+    blood_type: trimmed(input.bloodType, 2),
+    grade: trimmed(input.grade, 1),
+    grade_level: trimmed(input.gradeLevel, 10),
+    grade_perc: money(input.gradePerc) ?? "0",
+    perc1: money(input.perc1) ?? "0",
+    perc2: money(input.perc2) ?? "0",
+    sal_percent: money(input.salPercent) ?? "0",
+    sal_amount: money(input.salAmount) ?? "0",
+    grade_amount: money(input.gradeAmount) ?? "0",
+    command_no: trimmed(input.commandNo, 10),
+    command_description: trimmed(input.commandDescription, 100),
+    etax_code: trimmed(input.etaxCode, 30),
   };
+}
+
+function employeeId(value: string): number {
+  return requiredInt(value, "Employee ID");
 }
 
 function revalidateEmployeeViews(id?: string) {
   revalidatePath("/employees");
   revalidatePath("/departments");
+  revalidatePath("/dashboard");
   if (id) revalidatePath(`/employees/${id}`);
 }
 
 export async function createEmployee(input: EmployeeInput): Promise<string> {
-  if (!input.name?.trim()) throw new Error("Employee name is required");
-
-  const employee = await prisma.employee.create({
-    data: {
-      ...normalize(input),
-      active: true,
-      tags: {
-        create: uniqueIds(input.tagIds).map((tagId) => ({
-          tag: { connect: { id: tagId } },
-        })),
-      },
-    },
-    select: { id: true },
+  const created = await prisma.employee.create({
+    data: employeeData(input),
+    select: { employee_id: true },
   });
-
-  revalidateEmployeeViews(employee.id);
-  return employee.id;
+  const id = String(created.employee_id);
+  revalidateEmployeeViews(id);
+  return id;
 }
 
 export async function updateEmployee(
-  id: string,
+  idValue: string,
   input: EmployeeInput
 ): Promise<void> {
-  if (!input.name?.trim()) throw new Error("Employee name is required");
-
-  await prisma.$transaction([
-    prisma.employeeTag.deleteMany({ where: { employeeId: id } }),
-    prisma.employee.update({
-      where: { id },
-      data: {
-        ...normalize(input),
-        tags: {
-          create: uniqueIds(input.tagIds).map((tagId) => ({
-            tag: { connect: { id: tagId } },
-          })),
-        },
-      },
-    }),
-  ]);
-
-  revalidateEmployeeViews(id);
+  await prisma.employee.update({
+    where: { employee_id: employeeId(idValue) },
+    data: employeeData(input),
+  });
+  revalidateEmployeeViews(idValue);
 }
 
-export async function deleteEmployee(id: string): Promise<void> {
-  await prisma.employee.delete({ where: { id } });
-  revalidateEmployeeViews(id);
+export async function deleteEmployee(idValue: string): Promise<void> {
+  await prisma.employee.delete({ where: { employee_id: employeeId(idValue) } });
+  revalidateEmployeeViews(idValue);
 }
 
-export async function archiveEmployee(id: string): Promise<void> {
-  await prisma.employee.update({ where: { id }, data: { active: false } });
-  revalidateEmployeeViews(id);
+export async function archiveEmployee(idValue: string): Promise<void> {
+  await prisma.employee.update({
+    where: { employee_id: employeeId(idValue) },
+    data: { status: "inactive" },
+  });
+  revalidateEmployeeViews(idValue);
 }
 
 export async function createDepartment(input: {
   name: string;
-  managerId?: string | null;
   parentId?: string | null;
-  color?: string;
+  schedule?: string | null;
+  officeIdent?: string | null;
 }): Promise<string> {
-  if (!input.name?.trim()) throw new Error("Department name is required");
-  const colors = ["#22d3ee", "#d946a6", "#34d399", "#f59e0b", "#60a5fa"];
-  const count = await prisma.department.count();
-  const department = await prisma.department.create({
+  const created = await prisma.deps.create({
     data: {
-      name: input.name.trim(),
-      managerId: emptyToNull(input.managerId),
-      parentId: emptyToNull(input.parentId),
-      color: input.color || colors[count % colors.length],
+      name: requiredText(input.name, "Хэлтэс", 25),
+      parent_id: nullableInt(input.parentId),
+      schedule: nullableInt(input.schedule),
+      office_ident: nullableInt(input.officeIdent),
     },
-    select: { id: true },
+    select: { dep_id: true },
   });
   revalidatePath("/departments");
   revalidatePath("/employees");
-  return department.id;
+  return String(created.dep_id);
 }
 
 export async function updateDepartment(
-  id: string,
+  idValue: string,
   input: {
     name?: string;
-    managerId?: string | null;
     parentId?: string | null;
-    color?: string;
+    schedule?: string | null;
+    officeIdent?: string | null;
   }
 ): Promise<void> {
-  await prisma.department.update({
-    where: { id },
+  await prisma.deps.update({
+    where: { dep_id: requiredInt(idValue, "Department ID") },
     data: {
-      ...(input.name !== undefined ? { name: input.name.trim() } : {}),
-      ...(input.managerId !== undefined
-        ? { managerId: emptyToNull(input.managerId) }
+      ...(input.name !== undefined
+        ? { name: requiredText(input.name, "Хэлтэс", 25) }
         : {}),
       ...(input.parentId !== undefined
-        ? { parentId: emptyToNull(input.parentId) }
+        ? { parent_id: nullableInt(input.parentId) }
         : {}),
-      ...(input.color !== undefined ? { color: input.color } : {}),
+      ...(input.schedule !== undefined
+        ? { schedule: nullableInt(input.schedule) }
+        : {}),
+      ...(input.officeIdent !== undefined
+        ? { office_ident: nullableInt(input.officeIdent) }
+        : {}),
     },
   });
   revalidatePath("/departments");
   revalidatePath("/employees");
 }
 
-export async function deleteDepartment(id: string): Promise<void> {
-  await prisma.department.delete({ where: { id } });
+export async function deleteDepartment(idValue: string): Promise<void> {
+  await prisma.deps.delete({
+    where: { dep_id: requiredInt(idValue, "Department ID") },
+  });
   revalidatePath("/departments");
   revalidatePath("/employees");
 }
 
+function configValue(
+  type: string,
+  raw: unknown,
+  required: boolean | undefined,
+  label: string
+) {
+  if (raw == null || raw === "") {
+    if (required) throw new Error(`${label} шаардлагатай`);
+    return undefined;
+  }
+  if (type === "number" || type === "select")
+    return required ? requiredInt(raw, label) : optionalNumber(raw);
+  if (type === "decimal") return money(String(raw));
+  if (type === "date") return date(String(raw));
+  return String(raw).trim();
+}
+
+function configData(model: string, input: Record<string, unknown>) {
+  const def = CONFIG_DEFS[model];
+  if (!def) throw new Error("Unknown configuration model");
+  const data: Record<string, unknown> = {};
+  for (const field of def.fields) {
+    const value = configValue(
+      field.type,
+      input[field.key],
+      field.required,
+      field.label
+    );
+    if (value !== undefined) data[field.key] = value;
+  }
+  return data;
+}
+
 export async function createConfigItem(
-  model: ConfigModel,
+  model: string,
   data: Record<string, unknown>
 ): Promise<string> {
-  const name = String(data.name ?? "").trim();
-  if (!name) throw new Error("Name is required");
-
-  let created: { id: string };
-  switch (model) {
-    case "job-positions":
-      created = await prisma.jobPosition.create({
-        data: {
-          name,
-          departmentId: emptyToNull(data.departmentId as string | undefined),
-        },
-        select: { id: true },
-      });
-      break;
-    case "employee-types":
-      created = await prisma.employeeType.create({
-        data: { name },
-        select: { id: true },
-      });
-      break;
-    case "work-locations":
-      created = await prisma.workLocation.create({
-        data: {
-          name,
-          address: String(data.address ?? ""),
-          locationType: locationType(data.locationType),
-        },
-        select: { id: true },
-      });
-      break;
-    case "tags":
-      created = await prisma.tag.create({
-        data: { name, color: String(data.color ?? "#b45309") },
-        select: { id: true },
-      });
-      break;
-    case "departure-reasons":
-      created = await prisma.departureReason.create({
-        data: { name },
-        select: { id: true },
-      });
-      break;
-  }
-
+  const def = CONFIG_DEFS[model];
+  if (!def) throw new Error("Unknown configuration model");
+  const delegate = (
+    prisma as unknown as Record<
+      string,
+      { create: (args: unknown) => Promise<Record<string, unknown>> }
+    >
+  )[def.prisma];
+  const created = await delegate.create({
+    data: configData(model, data),
+    select: { [def.idKey]: true },
+  });
   revalidatePath(`/configuration/${model}`);
   revalidatePath("/employees");
-  return created.id;
+  return String(created[def.idKey]);
 }
 
 export async function updateConfigItem(
-  model: ConfigModel,
-  id: string,
+  model: string,
+  idValue: string,
   data: Record<string, unknown>
 ): Promise<void> {
-  const name = data.name === undefined ? undefined : String(data.name).trim();
-  switch (model) {
-    case "job-positions":
-      await prisma.jobPosition.update({
-        where: { id },
-        data: {
-          ...(name !== undefined ? { name } : {}),
-          ...(data.departmentId !== undefined
-            ? {
-                departmentId: emptyToNull(
-                  data.departmentId as string | undefined
-                ),
-              }
-            : {}),
-        },
-      });
-      break;
-    case "employee-types":
-      await prisma.employeeType.update({
-        where: { id },
-        data: { ...(name !== undefined ? { name } : {}) },
-      });
-      break;
-    case "work-locations":
-      await prisma.workLocation.update({
-        where: { id },
-        data: {
-          ...(name !== undefined ? { name } : {}),
-          ...(data.address !== undefined
-            ? { address: String(data.address ?? "") }
-            : {}),
-          ...(data.locationType !== undefined
-            ? { locationType: locationType(data.locationType) }
-            : {}),
-        },
-      });
-      break;
-    case "tags":
-      await prisma.tag.update({
-        where: { id },
-        data: {
-          ...(name !== undefined ? { name } : {}),
-          ...(data.color !== undefined ? { color: String(data.color) } : {}),
-        },
-      });
-      break;
-    case "departure-reasons":
-      await prisma.departureReason.update({
-        where: { id },
-        data: { ...(name !== undefined ? { name } : {}) },
-      });
-      break;
-  }
+  const def = CONFIG_DEFS[model];
+  if (!def) throw new Error("Unknown configuration model");
+  const delegate = (
+    prisma as unknown as Record<
+      string,
+      { update: (args: unknown) => Promise<unknown> }
+    >
+  )[def.prisma];
+  await delegate.update({
+    where: { [def.idKey]: requiredInt(idValue, "ID") },
+    data: configData(model, data),
+  });
   revalidatePath(`/configuration/${model}`);
   revalidatePath("/employees");
 }
 
 export async function deleteConfigItem(
-  model: ConfigModel,
-  id: string
+  model: string,
+  idValue: string
 ): Promise<void> {
-  switch (model) {
-    case "job-positions":
-      await prisma.jobPosition.delete({ where: { id } });
-      break;
-    case "employee-types":
-      await prisma.employeeType.delete({ where: { id } });
-      break;
-    case "work-locations":
-      await prisma.workLocation.delete({ where: { id } });
-      break;
-    case "tags":
-      await prisma.tag.delete({ where: { id } });
-      break;
-    case "departure-reasons":
-      await prisma.departureReason.delete({ where: { id } });
-      break;
-  }
+  const def = CONFIG_DEFS[model];
+  if (!def) throw new Error("Unknown configuration model");
+  const delegate = (
+    prisma as unknown as Record<
+      string,
+      { delete: (args: unknown) => Promise<unknown> }
+    >
+  )[def.prisma];
+  await delegate.delete({ where: { [def.idKey]: requiredInt(idValue, "ID") } });
   revalidatePath(`/configuration/${model}`);
   revalidatePath("/employees");
 }

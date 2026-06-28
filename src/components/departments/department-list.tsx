@@ -14,40 +14,47 @@ export function DepartmentList({
 }: {
   departments: DepartmentWithCount[];
 }) {
-  if (departments.length === 0) {
+  if (departments.length === 0)
     return (
-      <div className="py-24 text-center text-sm text-muted-foreground">
-        Одоогоор ямар нэг хэлтэс байхгүй байна.
+      <div className="py-20 text-center text-sm text-muted-foreground">
+        Хэлтэс бүртгэгдээгүй байна.
       </div>
     );
-  }
   return (
     <div className="p-4">
-      <div className="overflow-hidden rounded-xl border border-border bg-background/45 shadow-sm">
+      <div className="overflow-hidden rounded-md border bg-card">
         <Table>
           <TableHeader>
-            <TableRow className="bg-control-bar/90 hover:bg-control-bar">
+            <TableRow>
               <TableHead>Хэлтэс</TableHead>
-              <TableHead>Удирдах албан тушаалтан</TableHead>
-              <TableHead className="text-right">Ажилчид</TableHead>
+              <TableHead>Дээд хэлтэс</TableHead>
+              <TableHead>Ээлж</TableHead>
+              <TableHead>Оффис</TableHead>
+              <TableHead className="text-right">Ажилтан</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {departments.map((dep) => (
-              <TableRow key={dep.id}>
+            {departments.map((department) => (
+              <TableRow key={department.id}>
                 <TableCell className="font-medium">
                   <Link
-                    href={`/departments/${dep.id}`}
-                    className="hover:text-brand-teal"
+                    href={`/departments/${department.id}`}
+                    className="hover:underline"
                   >
-                    {dep.name}
+                    {department.name}
                   </Link>
                 </TableCell>
                 <TableCell className="text-muted-foreground">
-                  {dep.managerName ?? "—"}
+                  {department.parentName ?? "—"}
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {department.scheduleName ?? "—"}
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {department.officeName ?? "—"}
                 </TableCell>
                 <TableCell className="text-right text-muted-foreground">
-                  {dep.employeeCount}
+                  {department.employeeCount}
                 </TableCell>
               </TableRow>
             ))}
