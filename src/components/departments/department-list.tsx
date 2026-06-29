@@ -22,12 +22,12 @@ export function DepartmentList({
     );
   return (
     <div className="p-4">
-      <div className="overflow-hidden rounded-md border bg-card">
+      <div className="overflow-hidden rounded-sm border bg-card">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Хэлтэс</TableHead>
-              <TableHead>Дээд хэлтэс</TableHead>
+              <TableHead>Дэд хэлтэс</TableHead>
               <TableHead>Ээлж</TableHead>
               <TableHead>Оффис</TableHead>
               <TableHead className="text-right">Ажилтан</TableHead>
