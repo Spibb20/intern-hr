@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 import {
@@ -37,7 +36,7 @@ export function DepartmentForm({
 
   function save() {
     if (!name.trim()) {
-      toast.error("Хэлтэсийн нэр оруулах шаардлагатай");
+      toast.error("Хэлтсийн нэр оруулах шаардлагатай");
       return;
     }
     startTransition(async () => {
@@ -69,16 +68,16 @@ export function DepartmentForm({
           type="button"
           onClick={save}
           disabled={isPending}
-          className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 rounded-sm bg-primary px-3 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
         >
-          <Check className="size-4" /> Хадгалах
+          Хадгалах
         </button>
         <button
           type="button"
           onClick={() => router.push("/departments")}
-          className="inline-flex items-center gap-1.5 rounded-md border bg-background px-3 py-2 text-sm text-muted-foreground hover:bg-accent"
+          className="inline-flex items-center gap-1.5 rounded-sm border bg-background px-3 py-2 text-sm text-muted-foreground hover:bg-accent"
         >
-          <X className="size-4" /> Цуцлах
+          Цуцлах
         </button>
         <div className="ml-2 leading-tight">
           <div className="text-sm font-semibold">Хэлтэс</div>
@@ -89,10 +88,10 @@ export function DepartmentForm({
       </div>
 
       <div className="mx-auto w-full max-w-2xl px-4 py-6">
-        <div className="rounded-md border bg-card p-4">
+        <div className="rounded-sm border bg-card p-4">
           <div className="grid gap-4">
             <label className="grid gap-1.5 text-sm">
-              <span className="font-medium">Хэлтэсийн нэр</span>
+              <span className="font-medium">Хэлтсийн нэр</span>
               <input
                 value={name}
                 onChange={(event) => setName(event.target.value)}

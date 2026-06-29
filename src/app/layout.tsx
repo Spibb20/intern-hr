@@ -4,8 +4,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
-  title: "HR Employee",
-  description: "Employee management system",
+  title: "Хүний нөөц",
+  description: "Ажилтан, хэлтэс, лавлах мэдээллийн бүртгэл",
 };
 
 export default function RootLayout({

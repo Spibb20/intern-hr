@@ -3,14 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
-import { MoreVertical, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { deleteDepartment } from "@/lib/actions";
 import type { DepartmentWithCount } from "@/lib/data/queries";
 
@@ -37,7 +30,7 @@ export function DepartmentBoard({
   if (departments.length === 0) {
     return (
       <div className="py-20 text-center text-sm text-muted-foreground">
-        Хэлтэс байхгүй байна.{" "}
+        Хэлтэс бүртгэгдээгүй байна.{" "}
         <Link href="/departments/new" className="text-foreground underline">
           Шинээр нэмэх
         </Link>
@@ -46,11 +39,11 @@ export function DepartmentBoard({
   }
 
   return (
-    <div className="grid gap-3 p-4 md:grid-cols-2 2xl:grid-cols-3">
+    <div className="grid gap-3 p-3 md:grid-cols-2 2xl:grid-cols-3">
       {departments.map((department) => (
         <div
           key={department.id}
-          className="group rounded-md border bg-card p-4 transition-colors hover:border-foreground/25"
+          className="group border bg-card p-3 transition-colors hover:border-foreground/25"
         >
           <div className="flex items-start justify-between gap-3">
             <Link href={`/departments/${department.id}`} className="min-w-0">
@@ -59,36 +52,29 @@ export function DepartmentBoard({
               </h3>
               <p className="mt-1 text-sm text-muted-foreground">
                 {department.parentName
-                  ? `Дээд: ${department.parentName}`
+                  ? `Дээд хэлтэс: ${department.parentName}`
                   : "Дээд хэлтэсгүй"}
               </p>
             </Link>
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                aria-label="Department options"
-                className="rounded-md p-1 text-muted-foreground hover:bg-accent"
+            <div className="flex gap-1 text-xs">
+              <Link
+                href={`/departments/${department.id}`}
+                className="border px-2 py-1 hover:bg-accent"
               >
-                <MoreVertical className="size-4" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem asChild>
-                  <Link href={`/departments/${department.id}`}>Засах</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  variant="destructive"
-                  disabled={isPending}
-                  onSelect={(event) => {
-                    event.preventDefault();
-                    remove(department.id, department.name);
-                  }}
-                >
-                  <Trash2 className="size-4" /> Устгах
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                Засах
+              </Link>
+              <button
+                type="button"
+                disabled={isPending}
+                onClick={() => remove(department.id, department.name)}
+                className="border px-2 py-1 text-destructive hover:bg-accent disabled:opacity-50"
+              >
+                Устгах
+              </button>
+            </div>
           </div>
           <div className="mt-4 flex items-center justify-between border-t pt-3 text-sm text-muted-foreground">
-            <span>{department.officeName ?? "Оффисгүй"}</span>
+            <span>{department.officeName ?? "Алба/байршилгүй"}</span>
             <Link
               href={`/employees?department=${department.id}`}
               className="hover:underline"

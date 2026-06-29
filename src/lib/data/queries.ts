@@ -44,7 +44,7 @@ function displayName(row: Record<string, unknown>): string {
   if (full) return full;
   return (
     [text(row.surname), text(row.name)].filter(Boolean).join(" ") ||
-    `Employee ${row.employee_id}`
+    `Ажилтан ${row.employee_id}`
   );
 }
 
@@ -116,10 +116,13 @@ function mapEmployee(row: Record<string, unknown>): EmployeeWithRelations {
     wskillIdent: id(row.wskill_ident),
     branchIdent: id(row.branch_ident),
     bankIdent: id(row.bank_ident),
+    contractNum: text(row.contract_num),
     schedule: id(row.schedule),
     officeIdent: id(row.office_ident),
     nationalityIdent: id(row.nationality_ident),
+    niigmiinGaralIdent: id(row.niigmiin_garal_ident),
     countryIdent: id(row.country_ident),
+    votingWorkIdent: id(row.voting_work_ident),
     maritalstatusIdent: id(row.maritalstatus_ident),
     apartcondIdent: id(row.apartcond_ident),
     carowncondIdent: id(row.carowncond_ident),
@@ -128,6 +131,14 @@ function mapEmployee(row: Record<string, unknown>): EmployeeWithRelations {
     firedreasonIdent: id(row.firedreason_ident),
     clothessizeIdent: id(row.clothessize_ident),
     shoessizeIdent: id(row.shoessize_ident),
+    income: num(row.income),
+    locCode: text(row.loc_code),
+    foreignEmp: id(row.foreign_emp),
+    disabledEmp: id(row.disabled_emp),
+    takenLeave: id(row.taken_leave),
+    leaveType: id(row.leave_type),
+    limited: id(row.limited),
+    wageTestEmp: id(row.wagetest_emp),
     salary: decimal(row.salary),
     workingYear: num(row.working_year),
     workyearSector: num(row.workyear_sector),
@@ -165,7 +176,13 @@ function mapEmployee(row: Record<string, unknown>): EmployeeWithRelations {
     shift: relation(row.shift, "id", "name"),
     office,
     nationality: relation(row.nationality, "nationality_id", "description"),
+    niigmiinGaral: relation(
+      row.niigmiin_garal,
+      "niigmiin_garal_id",
+      "description"
+    ),
     country: relation(row.country, "country_ident", "description"),
+    votingWork: relation(row.voting_work, "voting_work_id", "description"),
     maritalStatus: marital,
     apartmentCondition: relation(
       row.apartment_cond,
@@ -217,7 +234,9 @@ const employeeInclude = {
   shift: true,
   office: true,
   nationality: true,
+  niigmiin_garal: true,
   country: true,
+  voting_work: true,
   marital_status: true,
   apartment_cond: true,
   carown_cond: true,
@@ -411,6 +430,12 @@ export async function getFormOptions(): Promise<Record<string, Option[]>> {
     nationalities,
     countries,
     degrees,
+    socialOrigins,
+    votingWorks,
+    driverTypes,
+    foreignLanguages,
+    professions,
+    specializations,
     insuranceTypes,
     firedReasons,
     apartmentConds,
@@ -434,6 +459,12 @@ export async function getFormOptions(): Promise<Record<string, Option[]>> {
     optionsFrom("nationalities"),
     optionsFrom("countries"),
     optionsFrom("degrees"),
+    optionsFrom("social-origin"),
+    optionsFrom("voting-work"),
+    optionsFrom("driver-types"),
+    optionsFrom("foreign-languages"),
+    optionsFrom("professions"),
+    optionsFrom("special-education-types"),
     optionsFrom("insurance-types"),
     optionsFrom("fired-reasons"),
     optionsFrom("apartment-conditions"),
@@ -462,6 +493,12 @@ export async function getFormOptions(): Promise<Record<string, Option[]>> {
     nationalities,
     countries,
     degrees,
+    socialOrigins,
+    votingWorks,
+    driverTypes,
+    foreignLanguages,
+    professions,
+    specializations,
     insuranceTypes,
     firedReasons,
     apartmentConds,
@@ -471,7 +508,13 @@ export async function getFormOptions(): Promise<Record<string, Option[]>> {
   };
 }
 
-export async function getDashboardStats() {
+export async function getDashboardStats(): Promise<{
+  employeeCount: number;
+  departmentCount: number;
+  occupationCount: number;
+  educationCount: number;
+  recentEmployees: EmployeeWithRelations[];
+}> {
   const [
     employeeCount,
     departmentCount,

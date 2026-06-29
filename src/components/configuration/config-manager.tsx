@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -155,7 +154,7 @@ export function ConfigManager({
       return (
         <span className="inline-flex items-center gap-2">
           <span
-            className="size-4 rounded border"
+            className="size-4 rounded-sm border"
             style={{ background: String(value || "#6b7280") }}
           />
           {String(value || "")}
@@ -173,12 +172,11 @@ export function ConfigManager({
     <div className="px-4 py-4 md:px-6">
       <div className="mb-3 flex justify-end">
         <Button size="sm" onClick={openCreate}>
-          <Plus className="size-4" />
           Шинээр нэмэх
         </Button>
       </div>
 
-      <div className="overflow-hidden rounded-md border bg-card">
+      <div className="overflow-hidden rounded-sm border bg-card">
         <Table>
           <TableHeader>
             <TableRow>
@@ -208,21 +206,18 @@ export function ConfigManager({
                     <div className="flex justify-end gap-1">
                       <Button
                         variant="ghost"
-                        size="icon"
-                        className="size-8"
+                        size="sm"
                         onClick={() => openEdit(row)}
                       >
-                        <Pencil className="size-4" />
-                        <span className="sr-only">Засах</span>
+                        Засах
                       </Button>
                       <Button
                         variant="ghost"
-                        size="icon"
-                        className="size-8 text-destructive hover:text-destructive"
+                        size="sm"
+                        className="text-destructive hover:text-destructive"
                         onClick={() => setDeleteId(String(row.id))}
                       >
-                        <Trash2 className="size-4" />
-                        <span className="sr-only">Устгах</span>
+                        Устгах
                       </Button>
                     </div>
                   </TableCell>
@@ -283,7 +278,7 @@ export function ConfigManager({
                           [field.key]: event.target.value,
                         }))
                       }
-                      className="h-9 w-14 rounded-md border bg-transparent"
+                      className="h-9 w-14 rounded-sm border bg-transparent"
                     />
                     <Input
                       value={draft[field.key] || ""}

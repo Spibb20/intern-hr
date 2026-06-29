@@ -23,7 +23,7 @@ export function EmployeeList({
 
   return (
     <div className="p-4">
-      <div className="overflow-hidden rounded-md border bg-card">
+      <div className="overflow-hidden rounded-sm border bg-card">
         <Table>
           <TableHeader>
             <TableRow>
@@ -63,8 +63,12 @@ export function EmployeeList({
                   {employee.department?.name ?? "—"}
                 </TableCell>
                 <TableCell>
-                  <span className="rounded-md border px-2 py-1 text-xs text-muted-foreground">
-                    {employee.status || "active"}
+                  <span className="rounded-sm border px-2 py-1 text-xs text-muted-foreground">
+                    {employee.status === "inactive"
+                      ? "Идэвхгүй"
+                      : employee.status === "fired"
+                      ? "Гарсан"
+                      : "Идэвхтэй"}
                   </span>
                 </TableCell>
               </TableRow>

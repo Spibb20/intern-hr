@@ -22,7 +22,7 @@ export default async function DepartmentsPage({
   return (
     <div className="flex flex-col">
       <ControlBar
-        title="Departments"
+        title="Хэлтэс"
         showGear
         newHref="/departments/new"
         total={departments.length}

@@ -36,7 +36,7 @@ export const CONFIG_DEFS: Record<string, ConfigDef> = {
       },
       {
         key: "sched_id",
-        label: "Schedule",
+        label: "Цагийн хуваарь",
         type: "select",
         optionsKey: "schedules",
       },
@@ -137,7 +137,7 @@ export const CONFIG_DEFS: Record<string, ConfigDef> = {
     labelKey: "description",
     fields: [
       { key: "description", label: "Төлөв", type: "text", required: true },
-      { key: "rpl_local", label: "Local", type: "text" },
+      { key: "rpl_local", label: "Дотоод", type: "text" },
     ],
   },
   "work-skills": {
@@ -188,13 +188,13 @@ export const CONFIG_DEFS: Record<string, ConfigDef> = {
   },
   degrees: {
     model: "degrees",
-    title: "Зэрэг",
+    title: "Эрдмийн зэрэг",
     prisma: "degree",
     idKey: "degree_id",
     labelKey: "description",
     fields: [
       { key: "description", label: "Зэрэг", type: "text", required: true },
-      { key: "rpl_local", label: "Local", type: "text" },
+      { key: "rpl_local", label: "Дотоод", type: "text" },
     ],
   },
   "insurance-types": {
@@ -229,18 +229,18 @@ export const CONFIG_DEFS: Record<string, ConfigDef> = {
     labelKey: "description",
     fields: [
       { key: "description", label: "Нөхцөл", type: "text", required: true },
-      { key: "rpl_local", label: "Local", type: "text" },
+      { key: "rpl_local", label: "Дотоод", type: "text" },
     ],
   },
   "car-ownership": {
     model: "car-ownership",
-    title: "Машин эзэмшил",
+    title: "Автомашин эзэмшил",
     prisma: "carown_cond",
     idKey: "carowncond_id",
     labelKey: "description",
     fields: [
       { key: "description", label: "Нөхцөл", type: "text", required: true },
-      { key: "rpl_local", label: "Local", type: "text" },
+      { key: "rpl_local", label: "Дотоод", type: "text" },
     ],
   },
   "social-origin": {
@@ -251,7 +251,7 @@ export const CONFIG_DEFS: Record<string, ConfigDef> = {
     labelKey: "description",
     fields: [
       { key: "description", label: "Нэр", type: "text", required: true },
-      { key: "rpl_local", label: "Local", type: "text" },
+      { key: "rpl_local", label: "Дотоод", type: "text" },
     ],
   },
   "voting-work": {
@@ -285,23 +285,44 @@ export const CONFIG_DEFS: Record<string, ConfigDef> = {
   },
   "education-types": {
     model: "education-types",
-    title: "Боловсролын төрөл",
+    title: "Сургуулийн төрөл",
     prisma: "edu_type",
     idKey: "education_id",
     labelKey: "name",
     fields: [
       { key: "name", label: "Нэр", type: "text", required: true },
-      { key: "rpl_local", label: "Local", type: "text" },
+      { key: "rpl_local", label: "Дотоод", type: "text" },
     ],
   },
   "special-education-types": {
     model: "special-education-types",
-    title: "Мэргэжлийн сургалтын төрөл",
+    title: "Мэргэшил",
     prisma: "spec_edu_type",
     idKey: "spec_edu_type_id",
     labelKey: "description",
     fields: [
       { key: "description", label: "Нэр", type: "text", required: true },
+    ],
+  },
+
+  professions: {
+    model: "professions",
+    title: "Мэргэжил",
+    prisma: "profession_type",
+    idKey: "professiontype_id",
+    labelKey: "description",
+    fields: [
+      { key: "description", label: "Мэргэжил", type: "text", required: true },
+    ],
+  },
+  "language-levels": {
+    model: "language-levels",
+    title: "Хэлний түвшин",
+    prisma: "lang_level",
+    idKey: "langlevel_id",
+    labelKey: "level_name",
+    fields: [
+      { key: "level_name", label: "Түвшин", type: "text", required: true },
     ],
   },
   "foreign-languages": {
@@ -312,7 +333,7 @@ export const CONFIG_DEFS: Record<string, ConfigDef> = {
     labelKey: "description",
     fields: [
       { key: "description", label: "Хэл", type: "text", required: true },
-      { key: "rpl_local", label: "Local", type: "text" },
+      { key: "rpl_local", label: "Дотоод", type: "text" },
     ],
   },
   "driver-types": {
@@ -323,7 +344,7 @@ export const CONFIG_DEFS: Record<string, ConfigDef> = {
     labelKey: "description",
     fields: [
       { key: "description", label: "Ангилал", type: "text", required: true },
-      { key: "rpl_local", label: "Local", type: "text" },
+      { key: "rpl_local", label: "Дотоод", type: "text" },
     ],
   },
   talents: {

@@ -39,7 +39,7 @@ export default async function EmployeesPage({
   return (
     <div className="flex flex-col">
       <ControlBar
-        title="Employees"
+        title="Ажилтан"
         newHref="/employees/new"
         total={total}
         page={page}

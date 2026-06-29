@@ -28,10 +28,13 @@ export interface EmployeeInput {
   wskillIdent?: string | null;
   branchIdent?: string | null;
   bankIdent?: string | null;
+  contractNum?: string;
   schedule?: string | null;
   officeIdent?: string | null;
   nationalityIdent?: string | null;
+  niigmiinGaralIdent?: string | null;
   countryIdent?: string | null;
+  votingWorkIdent?: string | null;
   maritalstatusIdent?: string | null;
   apartcondIdent?: string | null;
   carowncondIdent?: string | null;
@@ -40,6 +43,14 @@ export interface EmployeeInput {
   firedreasonIdent?: string | null;
   clothessizeIdent?: string | null;
   shoessizeIdent?: string | null;
+  income?: number | string;
+  locCode?: string;
+  foreignEmp?: string | null;
+  disabledEmp?: string | null;
+  takenLeave?: string | null;
+  leaveType?: string | null;
+  limited?: string | null;
+  wageTestEmp?: string | null;
   salary?: string;
   workingYear?: number;
   workyearSector?: number;
@@ -157,10 +168,13 @@ function employeeData(input: EmployeeInput) {
     wskill_ident: nullableInt(input.wskillIdent),
     branch_ident: nullableInt(input.branchIdent),
     bank_ident: nullableInt(input.bankIdent),
+    contract_num: trimmed(input.contractNum, 10),
     schedule: nullableInt(input.schedule),
     office_ident: nullableInt(input.officeIdent ?? input.workLocationId),
     nationality_ident: nullableInt(input.nationalityIdent),
+    niigmiin_garal_ident: nullableInt(input.niigmiinGaralIdent),
     country_ident: nullableInt(input.countryIdent),
+    voting_work_ident: nullableInt(input.votingWorkIdent),
     maritalstatus_ident: nullableInt(input.maritalstatusIdent),
     apartcond_ident: nullableInt(input.apartcondIdent),
     carowncond_ident: nullableInt(input.carowncondIdent),
@@ -169,6 +183,14 @@ function employeeData(input: EmployeeInput) {
     firedreason_ident: nullableInt(input.firedreasonIdent),
     clothessize_ident: nullableInt(input.clothessizeIdent),
     shoessize_ident: nullableInt(input.shoessizeIdent),
+    income: optionalNumber(input.income),
+    loc_code: trimmed(input.locCode, 4),
+    foreign_emp: nullableInt(input.foreignEmp),
+    disabled_emp: nullableInt(input.disabledEmp),
+    taken_leave: nullableInt(input.takenLeave),
+    leave_type: nullableInt(input.leaveType),
+    limited: nullableInt(input.limited),
+    wagetest_emp: nullableInt(input.wageTestEmp),
     salary: money(input.salary) ?? "0",
     working_year: input.workingYear ?? 0,
     workyear_sector: input.workyearSector ?? 0,
@@ -199,7 +221,7 @@ function employeeData(input: EmployeeInput) {
 }
 
 function employeeId(value: string): number {
-  return requiredInt(value, "Employee ID");
+  return requiredInt(value, "Ажилтны ID");
 }
 
 function revalidateEmployeeViews(id?: string) {
@@ -273,7 +295,7 @@ export async function updateDepartment(
   }
 ): Promise<void> {
   await prisma.deps.update({
-    where: { dep_id: requiredInt(idValue, "Department ID") },
+    where: { dep_id: requiredInt(idValue, "Хэлтсийн ID") },
     data: {
       ...(input.name !== undefined
         ? { name: requiredText(input.name, "Хэлтэс", 25) }
@@ -295,7 +317,7 @@ export async function updateDepartment(
 
 export async function deleteDepartment(idValue: string): Promise<void> {
   await prisma.deps.delete({
-    where: { dep_id: requiredInt(idValue, "Department ID") },
+    where: { dep_id: requiredInt(idValue, "Хэлтсийн ID") },
   });
   revalidatePath("/departments");
   revalidatePath("/employees");
@@ -320,7 +342,7 @@ function configValue(
 
 function configData(model: string, input: Record<string, unknown>) {
   const def = CONFIG_DEFS[model];
-  if (!def) throw new Error("Unknown configuration model");
+  if (!def) throw new Error("Тохиргооны төрөл олдсонгүй");
   const data: Record<string, unknown> = {};
   for (const field of def.fields) {
     const value = configValue(
@@ -339,7 +361,7 @@ export async function createConfigItem(
   data: Record<string, unknown>
 ): Promise<string> {
   const def = CONFIG_DEFS[model];
-  if (!def) throw new Error("Unknown configuration model");
+  if (!def) throw new Error("Тохиргооны төрөл олдсонгүй");
   const delegate = (
     prisma as unknown as Record<
       string,
@@ -361,7 +383,7 @@ export async function updateConfigItem(
   data: Record<string, unknown>
 ): Promise<void> {
   const def = CONFIG_DEFS[model];
-  if (!def) throw new Error("Unknown configuration model");
+  if (!def) throw new Error("Тохиргооны төрөл олдсонгүй");
   const delegate = (
     prisma as unknown as Record<
       string,
@@ -381,7 +403,7 @@ export async function deleteConfigItem(
   idValue: string
 ): Promise<void> {
   const def = CONFIG_DEFS[model];
-  if (!def) throw new Error("Unknown configuration model");
+  if (!def) throw new Error("Тохиргооны төрөл олдсонгүй");
   const delegate = (
     prisma as unknown as Record<
       string,

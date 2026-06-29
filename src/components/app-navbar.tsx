@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Database, Settings2, UsersRound } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { configSections } from "@/lib/config-navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,61 +11,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/theme-toggle";
-
-const configSections = [
-  {
-    label: "Үндсэн",
-    items: [
-      { label: "Албан тушаал", href: "/configuration/occupations" },
-      { label: "Боловсрол", href: "/configuration/education" },
-      { label: "Төгссөн сургууль", href: "/configuration/graduates" },
-      { label: "Ур чадвар", href: "/configuration/work-skills" },
-      { label: "Ээлж", href: "/configuration/shifts" },
-      { label: "Цагийн хуваарь", href: "/configuration/schedules" },
-      { label: "Оффис", href: "/configuration/offices" },
-    ],
-  },
-  {
-    label: "Байгууллага",
-    items: [
-      { label: "Салбар", href: "/configuration/branches" },
-      { label: "Банк", href: "/configuration/banks" },
-      { label: "Улс", href: "/configuration/countries" },
-      { label: "Хот/аймаг", href: "/configuration/cities" },
-      { label: "Дүүрэг/сум", href: "/configuration/districts" },
-    ],
-  },
-  {
-    label: "Ажилтны лавлах",
-    items: [
-      { label: "Үндэс угсаа", href: "/configuration/nationalities" },
-      { label: "Гэрлэлтийн төлөв", href: "/configuration/marital-status" },
-      { label: "Зэрэг", href: "/configuration/degrees" },
-      { label: "Даатгал", href: "/configuration/insurance-types" },
-      { label: "Гарсан шалтгаан", href: "/configuration/fired-reasons" },
-      { label: "Орон сууц", href: "/configuration/apartment-conditions" },
-      { label: "Машин эзэмшил", href: "/configuration/car-ownership" },
-      { label: "Хувцас/гутал", href: "/configuration/clothes-sizes" },
-    ],
-  },
-  {
-    label: "Нэмэлт",
-    items: [
-      { label: "Боловсролын төрөл", href: "/configuration/education-types" },
-      {
-        label: "Мэргэжлийн сургалт",
-        href: "/configuration/special-education-types",
-      },
-      { label: "Гадаад хэл", href: "/configuration/foreign-languages" },
-      { label: "Жолооны ангилал", href: "/configuration/driver-types" },
-      { label: "Авьяас", href: "/configuration/talents" },
-      { label: "Нийгмийн гарал", href: "/configuration/social-origin" },
-      { label: "Сонгуулийн ажил", href: "/configuration/voting-work" },
-    ],
-  },
-];
 
 function NavLink({ href, label }: { href: string; label: string }) {
   const pathname = usePathname();
@@ -74,8 +20,8 @@ function NavLink({ href, label }: { href: string; label: string }) {
     <Link
       href={href}
       className={cn(
-        "rounded-md px-3 py-2 text-sm font-medium text-navbar-foreground/85 hover:bg-white/10",
-        active && "bg-white/12 text-navbar-foreground"
+        "px-3 py-2 text-sm text-navbar-foreground/85 hover:bg-white/10",
+        active && "bg-white/15 text-navbar-foreground"
       )}
     >
       {label}
@@ -85,37 +31,37 @@ function NavLink({ href, label }: { href: string; label: string }) {
 
 export function AppNavbar() {
   const pathname = usePathname();
-  const configActive = pathname.startsWith("/configuration");
+  const configActive =
+    pathname.startsWith("/configuration") ||
+    pathname.startsWith("/departments");
 
   return (
-    <header className="sticky top-0 z-40 flex min-h-12 flex-wrap items-center gap-1 border-b bg-navbar px-3 text-navbar-foreground">
-      <Link href="/dashboard" className="mr-2 flex items-center gap-2 py-2">
-        <span className="flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground">
-          <UsersRound className="size-4" />
-        </span>
-        <span className="text-sm font-semibold">HR</span>
+    <header className="sticky top-0 z-40 flex min-h-11 items-center border-b bg-navbar px-3 text-navbar-foreground">
+      <Link href="/dashboard" className="mr-3 py-2 text-sm font-semibold">
+        Хүний нөөц
       </Link>
 
-      <nav className="flex flex-wrap items-center gap-0.5">
-        <NavLink href="/dashboard" label="Dashboard" />
-        <NavLink href="/employees" label="Ажилчид" />
-        <NavLink href="/departments" label="Хэлтэс" />
+      <nav className="flex items-center text-sm">
+        <NavLink href="/employees" label="Ажилтан" />
         <DropdownMenu>
           <DropdownMenuTrigger
             className={cn(
-              "rounded-md px-3 py-2 text-sm font-medium text-navbar-foreground/85 outline-none hover:bg-white/10",
-              configActive && "bg-white/12 text-navbar-foreground"
+              "px-3 py-2 text-sm text-navbar-foreground/85 outline-none hover:bg-white/10",
+              configActive && "bg-white/15 text-navbar-foreground"
             )}
           >
-            Configuration
+            Тохируулга
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="start"
-            className="max-h-[75vh] w-72 overflow-y-auto"
+            className="max-h-[78vh] w-72 overflow-y-auto rounded-sm"
           >
+            <DropdownMenuItem asChild>
+              <Link href="/configuration">Тохируулгын нүүр</Link>
+            </DropdownMenuItem>
             {configSections.map((section) => (
               <div key={section.label}>
-                <DropdownMenuLabel className="text-xs uppercase tracking-wide text-muted-foreground">
+                <DropdownMenuLabel className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   {section.label}
                 </DropdownMenuLabel>
                 {section.items.map((item) => (
@@ -129,13 +75,11 @@ export function AppNavbar() {
         </DropdownMenu>
       </nav>
 
-      <div className="ml-auto flex items-center gap-2 py-2">
+      <div className="ml-auto flex items-center gap-2 py-1.5">
         <ThemeToggle />
-        <Settings2 className="hidden size-4 text-navbar-foreground/70 sm:block" />
-        <Database className="hidden size-4 text-navbar-foreground/70 sm:block" />
-        <Avatar className="size-7 rounded-md">
-          <AvatarFallback className="rounded-md text-xs">HR</AvatarFallback>
-        </Avatar>
+        <span className="hidden border-l pl-3 text-xs text-navbar-foreground/75 sm:inline">
+          Хэрэглэгч
+        </span>
       </div>
     </header>
   );

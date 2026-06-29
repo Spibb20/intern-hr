@@ -53,10 +53,13 @@ export interface Employee {
   wskillIdent: ID | null;
   branchIdent: ID | null;
   bankIdent: ID | null;
+  contractNum: string;
   schedule: ID | null;
   officeIdent: ID | null;
   nationalityIdent: ID | null;
+  niigmiinGaralIdent: ID | null;
   countryIdent: ID | null;
+  votingWorkIdent: ID | null;
   maritalstatusIdent: ID | null;
   apartcondIdent: ID | null;
   carowncondIdent: ID | null;
@@ -65,6 +68,14 @@ export interface Employee {
   firedreasonIdent: ID | null;
   clothessizeIdent: ID | null;
   shoessizeIdent: ID | null;
+  income: number;
+  locCode: string;
+  foreignEmp: ID | null;
+  disabledEmp: ID | null;
+  takenLeave: ID | null;
+  leaveType: ID | null;
+  limited: ID | null;
+  wageTestEmp: ID | null;
   salary: string;
   workingYear: number;
   workyearSector: number;
@@ -102,7 +113,9 @@ export interface Employee {
   shift?: SimpleRelation | null;
   office?: SimpleRelation | null;
   nationality?: SimpleRelation | null;
+  niigmiinGaral?: SimpleRelation | null;
   country?: SimpleRelation | null;
+  votingWork?: SimpleRelation | null;
   maritalStatus?: SimpleRelation | null;
   apartmentCondition?: SimpleRelation | null;
   carOwnershipCondition?: SimpleRelation | null;
